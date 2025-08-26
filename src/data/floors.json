@@ -1,0 +1,20 @@
+[
+  {
+    "id": "planta-1",
+    "name": "Planta 1",
+    "zones": [
+      { 
+        "id": "contabilidad", 
+        "name": "Contabilidad" 
+      },
+      { 
+        "id": "administracion", 
+        "name": "Administración" 
+      },
+      { 
+        "id": "gerencia", 
+        "name": "Gerencia" 
+      }
+    ]
+  }
+]
