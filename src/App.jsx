@@ -1,28 +1,44 @@
 import { useState, useEffect } from 'react';
-import { useDevicesDB, useRoomObjectsDB } from './hooks/useDatabase.jsx';
+import { useDevicesDB, useRoomObjectsDB, useFloors } from './hooks/useDatabase.jsx'; 
 import { useObjectMovement } from './hooks/useObjectMovement.jsx';
 import MainLayout from './components/MainLayout.jsx';
 import Canvas from './components/Canvas.jsx';
 import DeviceTypeSelector from './components/DeviceTypeSelector.jsx';
 import DeviceInfoModal from './components/DeviceInfoModal.jsx';
 
-// ✅ IMPORTAR ICONOS
 import { FiMove } from 'react-icons/fi';
 
 function App() {
   
   const { devices, loading: devicesLoading, addDevice, updateDevicePosition, deleteDevice } = useDevicesDB();
   const { roomObjects, loading: roomObjectsLoading, addRoomObject, updateRoomObject, deleteRoomObject } = useRoomObjectsDB();
+  const { floors, loading: floorsLoading } = useFloors();
   const { dragState, startDrag, updateDrag, endDrag, cancelDrag } = useObjectMovement();
   
-  const [currentFloor, setCurrentFloor] = useState('planta-1');
-  const [currentZone, setCurrentZone] = useState('contabilidad');
+  // Inicializar con null hasta que los datos se carguen
+  const [currentFloor, setCurrentFloor] = useState(null);
+  const [currentZone, setCurrentZone] = useState(null);
   
   // Estados para los modales
   const [showDeviceTypeSelector, setShowDeviceTypeSelector] = useState(false);
   const [showDeviceInfoModal, setShowDeviceInfoModal] = useState(false);
   const [selectedDeviceType, setSelectedDeviceType] = useState(null);
 
+  // Efecto para inicializar ubicación con los primeros datos disponibles
+  useEffect(() => {
+    if (floors.length > 0 && !currentFloor) {
+      const firstFloor = floors[0];
+      const firstZone = firstFloor.zones.length > 0 ? firstFloor.zones[0] : null;
+      
+      if (firstZone) {
+        setCurrentFloor(firstFloor.id);
+        setCurrentZone(firstZone.id);
+        console.log(`📍 Ubicación inicial: ${firstFloor.name} > ${firstZone.name}`);
+      }
+    }
+  }, [floors, currentFloor]);
+
+  // Validar que currentFloor y currentZone existan antes de filtrar
   const currentRoomObjects = roomObjects.filter(obj => 
     obj.floor === currentFloor && obj.zone === currentZone
   );
@@ -47,6 +63,11 @@ function App() {
     } else if (isRoomObject(object)) {
       deleteRoomObject(object.id);
     }
+  };
+
+  // Función para actualizar posición de objetos de habitación
+  const updateRoomObjectPosition = (objectId, newPosition) => {
+    updateRoomObject(objectId, { position: newPosition });
   };
 
   // Eventos globales de mouse para el drag
@@ -124,10 +145,11 @@ function App() {
     setSelectedDeviceType(null);
   };
 
-  // Considerar ambos loadings
-  const loading = devicesLoading || roomObjectsLoading;
+  // Considerar todos los loadings
+  const loading = devicesLoading || roomObjectsLoading || floorsLoading;
 
-  if (loading) {
+  // Mostrar loading hasta que tengamos ubicación válida
+  if (loading || !currentFloor || !currentZone) {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="text-lg">Cargando aplicación...</div>
@@ -148,15 +170,16 @@ function App() {
           roomObjects={currentRoomObjects}
           floorId={currentFloor}
           zoneId={currentZone}
+          floors={floors}
           onStartDrag={startDrag}
           onAddRoomObject={addRoomObject}
-          onUpdateRoomObject={updateRoomObject}
+          onUpdateRoomObject={updateRoomObjectPosition} 
           onDeleteObject={handleDeleteObject}
           dragState={dragState}
         />
       </MainLayout>
 
-      {/* ✅ VISTA PREVIA DE ARRASTRE MEJORADA */}
+      {/* VISTA PREVIA DE ARRASTRE */}
       {dragState.isDragging && (
         <div
           className="fixed pointer-events-none z-50"

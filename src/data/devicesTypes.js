@@ -4,28 +4,24 @@ import { FaRegFloppyDisk } from "react-icons/fa6";
 export const DEVICE_TYPES = {
   desktop: {
     icon: BsPcDisplay,
-    name: "PC Escritorio",
-    fields: ["name", "ram", "processor", "ip", "mac", "os", "network_port"]
+    name: "PC Escritorio"
+    // ❌ Eliminamos fields predefinidos
   },
   laptop: {
     icon: BsLaptop,
-    name: "Notebook",
-    fields: ["name", "ram", "processor", "ip", "mac", "os", "network_port"]
+    name: "Notebook"
   },
   network: {
     icon: BsEthernet,
-    name: "Red",
-    fields: ["name", "ram", "processor", "ip", "mac", "os", "network_port"]
+    name: "Red"
   },
   printer: {
     icon: BsPrinter,
-    name: "Impresora",
-    fields: ["name", "model", "ip", "toner"]
+    name: "Impresora"
   },
   others: {
     icon: FaRegFloppyDisk,
-    name: "Otros Dispositivos",
-    fields: ["name", "model", "ip", "network_port", "info"]
+    name: "Otros Dispositivos"
   },
 };
 

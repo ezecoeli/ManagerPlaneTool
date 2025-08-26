@@ -1,19 +1,11 @@
 [
   {
-    "id": "planta-1",
-    "name": "Planta 1",
+    "id": "Zona-X",
+    "name": "Zona X",
     "zones": [
       { 
-        "id": "contabilidad", 
-        "name": "Contabilidad" 
-      },
-      { 
-        "id": "administracion", 
-        "name": "Administración" 
-      },
-      { 
-        "id": "gerencia", 
-        "name": "Gerencia" 
+        "id": "Oficina X", 
+        "name": "Oficina X" 
       }
     ]
   }

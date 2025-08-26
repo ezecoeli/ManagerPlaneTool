@@ -12,7 +12,8 @@ const Canvas = ({
   devices, 
   roomObjects,
   floorId, 
-  zoneId, 
+  zoneId,
+  floors = [], 
   onStartDrag, 
   onAddRoomObject,
   onUpdateRoomObject,
@@ -29,6 +30,19 @@ const Canvas = ({
   const [objectToDelete, setObjectToDelete] = useState(null);
 
   const currentRoomObjects = roomObjects;
+
+  const getLocationNames = () => {
+    const floor = floors.find(f => f.id === floorId);
+    if (!floor) return { floorName: floorId, zoneName: zoneId };
+    
+    const zone = floor.zones.find(z => z.id === zoneId);
+    return {
+      floorName: floor.name,
+      zoneName: zone ? zone.name : zoneId
+    };
+  };
+
+  const { floorName, zoneName } = getLocationNames();
 
   const handleZoomIn = () => {
     setZoom(prev => Math.min(prev * 1.2, 3));
@@ -138,7 +152,7 @@ const Canvas = ({
       <div className="bg-white border-b px-4 py-3 flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold text-gray-800">
-            Plano - {floorId} / {zoneId}
+            Plano - {floorName} / {zoneName}
           </h2>
           <p className="text-sm text-gray-600">
             {devices.length} dispositivo{devices.length !== 1 ? 's' : ''} • {currentRoomObjects.length} objeto{currentRoomObjects.length !== 1 ? 's' : ''}
