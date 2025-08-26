@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useFloors } from '../hooks/useDatabase.jsx';
 import { DEVICE_TYPES } from '../data/devicesTypes.js';
 import { BsPlus, BsTrash } from 'react-icons/bs';
+import { GiPositionMarker } from "react-icons/gi";
 
 const DeviceInfoModal = ({ deviceType, currentFloor, currentZone, onSave, onCancel }) => {
   const { floors, loading } = useFloors();
@@ -248,8 +249,8 @@ const DeviceInfoModal = ({ deviceType, currentFloor, currentZone, onSave, onCanc
               
               {/* Mostrar ubicación seleccionada */}
               {deviceData.floor && deviceData.zone && (
-                <div className="mt-2 text-xs text-gray-500">
-                  📍 Ubicación: {availableLocations.find(loc => loc.id === getCurrentLocationId())?.displayName}
+                <div className="flex mt-2 text-xs text-gray-500">
+                  <GiPositionMarker className='w-4 h-4' /> Ubicación: {availableLocations.find(loc => loc.id === getCurrentLocationId())?.displayName}
                 </div>
               )}
             </div>
@@ -306,7 +307,7 @@ const DeviceInfoModal = ({ deviceType, currentFloor, currentZone, onSave, onCanc
                   onClick={addCustomProperty}
                   className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 flex items-center space-x-1"
                 >
-                  <BsPlus className="w-4 h-4" />
+                  <BsPlus className="w-5 h-5" />
                   <span>Añadir Propiedad</span>
                 </button>
               </div>

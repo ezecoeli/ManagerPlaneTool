@@ -65,7 +65,7 @@ const MainLayout = ({ children, currentFloor, currentZone, onFloorChange, onAddD
                 title="Gestionar plantas y zonas"
               >
                 <span><BsTools /></span>
-                <span>Gestionar Plantas/Zonas</span>
+                <span>Crear/Modificar Zonas</span>
               </button>
             </div>
           </div>

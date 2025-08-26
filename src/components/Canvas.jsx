@@ -333,7 +333,7 @@ const Canvas = ({
               </div>
               <h3 className="text-lg font-medium mb-2">Plano vacío</h3>
               <p className="text-sm">
-                Utiliza "+" para añadir dispositivos o <BsPen className="inline w-4 h-4 mx-1" /> para construir planos
+                Utiliza "+" para añadir dispositivos o <BsPen className="inline w-4 h-4 mx-1" /> para añadir objetos al plano.
               </p>
               <p className="text-xs mt-2 text-gray-400">
                 Arrastra elementos para posicionarlos • Click derecho para eliminar
