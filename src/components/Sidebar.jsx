@@ -36,11 +36,11 @@ const Sidebar = ({ currentFloor, currentZone, onFloorChange, onAddDevice, floors
   };
 
   return (
-    <div className="h-full flex flex-col bg-white dark:bg-gray-800 transition-colors duration-200">
+    <div className="h-full flex flex-col bg-white dark:bg-gray-700 transition-colors duration-200">
       {/* Header del Sidebar */}
-      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-        <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Zonas y sub-zonas</h2>
-        <p className="text-sm text-gray-600 dark:text-gray-400">Selecciona donde trabajar</p>
+      <div className="p-3 border-b border-gray-200 dark:border-gray-500">
+        <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Zonas disponibles:</h2>
+        <p className="text-sm text-gray-600 dark:text-gray-400">Selecciona una para trabajar</p>
       </div>
 
       {/* Lista de plantas y zonas */}

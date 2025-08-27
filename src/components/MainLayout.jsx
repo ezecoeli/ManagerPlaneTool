@@ -45,7 +45,7 @@ const MainLayout = ({
               <button
                 onClick={toggleTheme}
                 className={`
-                  relative p-3 rounded-xl transition-all duration-300 ease-in-out
+                  relative p-2.5 rounded-xl transition-all duration-300 ease-in-out
                   transform hover:scale-105 active:scale-95
                   shadow-lg hover:shadow-xl
                   ${theme === 'light' 

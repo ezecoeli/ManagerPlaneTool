@@ -171,7 +171,7 @@ const Canvas = ({
   return (
     <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900 transition-colors duration-200" data-canvas-container>
       {/* Canvas Header */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center justify-between transition-colors duration-200">
+      <div className="bg-white dark:bg-gray-700 border-b border-gray-300 dark:border-gray-500 px-4 py-3 flex items-center justify-between transition-colors duration-200">
         <div>
           <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
             Plano - {floorId} / {zoneId}

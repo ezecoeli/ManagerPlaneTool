@@ -50,7 +50,7 @@ const EditableObject = ({ object, zoom, onStartDrag, onUpdate, isBeingDragged = 
 
   const getDefaultBorderColor = () => {
     if (theme === 'dark') {
-      return '#d1d5db'; // gray-300 para modo oscuro
+      return '#ffffff'; // white para modo oscuro
     } else {
       return '#374151'; // gray-700 para modo claro
     }
@@ -61,7 +61,7 @@ const EditableObject = ({ object, zoom, onStartDrag, onUpdate, isBeingDragged = 
       case 'wall-horizontal':
         return (
           <div className="w-full h-full relative">
-            <div className="w-full h-full bg-gray-600 dark:bg-gray-300 border-t border-b border-gray-700 dark:border-gray-400 shadow-md" />
+            <div className="w-full h-full bg-gray-600 dark:bg-white border-t border-b border-gray-700 dark:border-gray-400 shadow-md" />
             <div className="absolute top-0 left-0 right-0 h-px bg-gray-800 dark:bg-gray-500"></div>
             <div className="absolute bottom-0 left-0 right-0 h-px bg-gray-400 dark:bg-gray-200"></div>
           </div>
@@ -70,7 +70,7 @@ const EditableObject = ({ object, zoom, onStartDrag, onUpdate, isBeingDragged = 
       case 'wall-vertical':
         return (
           <div className="w-full h-full relative">
-            <div className="w-full h-full bg-gray-600 dark:bg-gray-300 border-l border-r border-gray-700 dark:border-gray-400 shadow-md" />
+            <div className="w-full h-full bg-gray-600 dark:bg-white border-l border-r border-gray-700 dark:border-gray-400 shadow-md" />
             <div className="absolute top-0 bottom-0 left-0 w-px bg-gray-800 dark:bg-gray-500"></div>
             <div className="absolute top-0 bottom-0 right-0 w-px bg-gray-400 dark:bg-gray-200"></div>
           </div>
@@ -91,7 +91,7 @@ const EditableObject = ({ object, zoom, onStartDrag, onUpdate, isBeingDragged = 
                 x2="100%" 
                 y2="0" 
                 stroke="#4b5563" 
-                className="dark:stroke-gray-300"
+                className="dark:stroke-white"
                 strokeWidth="8"
                 strokeLinecap="round"
                 style={{ pointerEvents: 'stroke' }}
@@ -102,7 +102,7 @@ const EditableObject = ({ object, zoom, onStartDrag, onUpdate, isBeingDragged = 
                 x2="100%" 
                 y2="2" 
                 stroke="#374151" 
-                className="dark:stroke-gray-400"
+                className="dark:stroke-white"
                 strokeWidth="4"
                 strokeLinecap="round"
                 style={{ pointerEvents: 'none' }}
@@ -133,7 +133,7 @@ const EditableObject = ({ object, zoom, onStartDrag, onUpdate, isBeingDragged = 
                 x2="100%" 
                 y2="100%" 
                 stroke="#4b5563" 
-                className="dark:stroke-gray-300"
+                className="dark:stroke-white"
                 strokeWidth="8"
                 strokeLinecap="round"
                 style={{ pointerEvents: 'stroke' }}
@@ -144,7 +144,7 @@ const EditableObject = ({ object, zoom, onStartDrag, onUpdate, isBeingDragged = 
                 x2="100%" 
                 y2="100%" 
                 stroke="#374151" 
-                className="dark:stroke-gray-400"
+                className="dark:stroke-white"
                 strokeWidth="4"
                 strokeLinecap="round"
                 style={{ pointerEvents: 'none' }}
@@ -161,30 +161,27 @@ const EditableObject = ({ object, zoom, onStartDrag, onUpdate, isBeingDragged = 
         );
       
       case 'rectangle': {
-        // Detectar si hay color personalizado
-        const hasCustomBg = !!object.properties?.backgroundColor;
-        const hasCustomBorder = !!object.properties?.color;
+        const hasCustomBg = object.properties?.backgroundColor && object.properties.backgroundColor !== 'transparent';
+        const hasCustomBorder = object.properties?.color;
+        
         return (
           <div className="w-full h-full relative">
             <div
-              className={`
-                w-full h-full shadow-md
-                ${!hasCustomBg ? 'bg-white dark:bg-gray-700' : ''}
-                ${!hasCustomBorder ? 'border-gray-700 dark:border-gray-300' : ''}
-              `}
+              className="w-full h-full shadow-md"
               style={{
-                backgroundColor: hasCustomBg ? object.properties.backgroundColor : undefined,
+                // fondo transparente siempre
+                backgroundColor: 'transparent',
+                borderColor: hasCustomBorder ? object.properties.color : getDefaultBorderColor(),
                 borderWidth: object.properties?.borderWidth || 8,
                 borderStyle: object.properties?.borderStyle || 'solid',
-                borderColor: hasCustomBorder ? object.properties.color : undefined,
                 borderRadius: object.properties?.borderRadius || 0
               }}
             />
-            {/* Efectos de esquina */}
-            <div className="absolute top-0 left-0 w-2 h-2 bg-gray-700 dark:bg-gray-200 opacity-40"></div>
-            <div className="absolute top-0 right-0 w-2 h-2 bg-gray-500 dark:bg-gray-100 opacity-40"></div>
-            <div className="absolute bottom-0 left-0 w-2 h-2 bg-gray-700 dark:bg-gray-200 opacity-40"></div>
-            <div className="absolute bottom-0 right-0 w-2 h-2 bg-gray-500 dark:bg-gray-100 opacity-40"></div>
+            {/* Efectos de esquina con colores adaptativos */}
+            <div className={`absolute top-0 left-0 w-2 h-2 opacity-40 ${theme === 'dark' ? 'bg-white' : 'bg-black'}`}></div>
+            <div className={`absolute top-0 right-0 w-2 h-2 opacity-40 ${theme === 'dark' ? 'bg-white' : 'bg-black'}`}></div>
+            <div className={`absolute bottom-0 left-0 w-2 h-2 opacity-40 ${theme === 'dark' ? 'bg-white' : 'bg-black'}`}></div>
+            <div className={`absolute bottom-0 right-0 w-2 h-2 opacity-40 ${theme === 'dark' ? 'bg-white' : 'bg-black'}`}></div>
           </div>
         );
       }
@@ -192,7 +189,7 @@ const EditableObject = ({ object, zoom, onStartDrag, onUpdate, isBeingDragged = 
       case 'door':
         return (
           <div className="w-full h-full flex items-center justify-center text-black dark:text-white">
-            <BsDoorOpen size={24} />
+            <BsDoorOpen size={28} />
           </div>
         );
       

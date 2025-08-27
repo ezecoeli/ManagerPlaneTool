@@ -27,7 +27,6 @@ export const ROOM_OBJECT_TYPES = {
     name: 'Cuadrado/Rectángulo',
     icon: '▢',
     defaultSize: { width: 300, height: 250 },
-    color: '#374151'
   },
   'door': {
     name: 'Puerta',
@@ -57,20 +56,22 @@ export const createRoomObject = (type, position) => {
     size: { ...objectType.defaultSize },
     name: objectType.name,
     properties: {
-      color: objectType.color,
+      
+      ...(type !== 'rectangle' && { color: objectType.color }),
       // Propiedades para rectángulo
       ...(type === 'rectangle' && {
         borderWidth: 8,
         borderStyle: 'solid',
         backgroundColor: 'transparent',
         borderRadius: 0
+    
       }),
-      // Propiedades  para texto
+      // Propiedades para texto
       ...(type === 'text' && {
         fontSize: 16, 
         fontWeight: 'normal',
         textAlign: 'center',
-        color: '#000000', // color por defecto 
+        color: '#000000',
         backgroundColor: 'transparent',
         padding: 4 
       })
