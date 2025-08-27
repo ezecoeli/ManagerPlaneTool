@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { ROOM_OBJECT_TYPES } from '../data/roomTypes.js';
 import { BsDoorOpen } from "react-icons/bs";
+import { useTheme } from '../hooks/useTheme.jsx';
 
 const EditableObject = ({ object, zoom, onStartDrag, onUpdate, isBeingDragged = false }) => {
   const [showTooltip, setShowTooltip] = useState(false);
+  const { theme } = useTheme(); 
   const objectType = ROOM_OBJECT_TYPES[object.type];
 
   const handleMouseDown = (e) => {
@@ -22,38 +24,35 @@ const EditableObject = ({ object, zoom, onStartDrag, onUpdate, isBeingDragged = 
     setShowTooltip(false);
   };
 
-  // Función para manejar cambios en el objeto (usar luego)
   const handleObjectChange = (changes) => {
     if (onUpdate) {
       onUpdate(object.id, changes);
     }
   };
 
-  // Sistema de capas Z-INDEX mejorado
   const getZIndex = (objectType) => {
     switch(objectType) {
-      // Capa 0: Elementos de fondo
       case 'rectangle': 
         return 0;
-      
-      // Capa 10: Paredes y estructuras
       case 'wall-horizontal':
       case 'wall-vertical': 
       case 'wall-diagonal':
       case 'wall-diagonal-reverse':
         return 10;
-      
-      // Capa 50: Elementos interactivos (puertas)
       case 'door': 
         return 50;
-      
-      // Capa 100: Elementos de información (texto)
       case 'text': 
         return 100;
-      
-      // Por defecto: elementos nuevos
       default: 
         return 25;
+    }
+  };
+
+  const getDefaultBorderColor = () => {
+    if (theme === 'dark') {
+      return '#d1d5db'; // gray-300 para modo oscuro
+    } else {
+      return '#374151'; // gray-700 para modo claro
     }
   };
 
@@ -62,18 +61,18 @@ const EditableObject = ({ object, zoom, onStartDrag, onUpdate, isBeingDragged = 
       case 'wall-horizontal':
         return (
           <div className="w-full h-full relative">
-            <div className="w-full h-full bg-gray-800 border-t border-b border-gray-900 shadow-md" />
-            <div className="absolute top-0 left-0 right-0 h-px bg-gray-900"></div>
-            <div className="absolute bottom-0 left-0 right-0 h-px bg-gray-600"></div>
+            <div className="w-full h-full bg-gray-600 dark:bg-gray-300 border-t border-b border-gray-700 dark:border-gray-400 shadow-md" />
+            <div className="absolute top-0 left-0 right-0 h-px bg-gray-800 dark:bg-gray-500"></div>
+            <div className="absolute bottom-0 left-0 right-0 h-px bg-gray-400 dark:bg-gray-200"></div>
           </div>
         );
       
       case 'wall-vertical':
         return (
           <div className="w-full h-full relative">
-            <div className="w-full h-full bg-gray-800 border-l border-r border-gray-900 shadow-md" />
-            <div className="absolute top-0 bottom-0 left-0 w-px bg-gray-900"></div>
-            <div className="absolute top-0 bottom-0 right-0 w-px bg-gray-600"></div>
+            <div className="w-full h-full bg-gray-600 dark:bg-gray-300 border-l border-r border-gray-700 dark:border-gray-400 shadow-md" />
+            <div className="absolute top-0 bottom-0 left-0 w-px bg-gray-800 dark:bg-gray-500"></div>
+            <div className="absolute top-0 bottom-0 right-0 w-px bg-gray-400 dark:bg-gray-200"></div>
           </div>
         );
       
@@ -91,7 +90,8 @@ const EditableObject = ({ object, zoom, onStartDrag, onUpdate, isBeingDragged = 
                 y1="100%" 
                 x2="100%" 
                 y2="0" 
-                stroke="#374151" 
+                stroke="#4b5563" 
+                className="dark:stroke-gray-300"
                 strokeWidth="8"
                 strokeLinecap="round"
                 style={{ pointerEvents: 'stroke' }}
@@ -101,7 +101,8 @@ const EditableObject = ({ object, zoom, onStartDrag, onUpdate, isBeingDragged = 
                 y1="100%" 
                 x2="100%" 
                 y2="2" 
-                stroke="#1f2937" 
+                stroke="#374151" 
+                className="dark:stroke-gray-400"
                 strokeWidth="4"
                 strokeLinecap="round"
                 style={{ pointerEvents: 'none' }}
@@ -131,7 +132,8 @@ const EditableObject = ({ object, zoom, onStartDrag, onUpdate, isBeingDragged = 
                 y1="0" 
                 x2="100%" 
                 y2="100%" 
-                stroke="#374151" 
+                stroke="#4b5563" 
+                className="dark:stroke-gray-300"
                 strokeWidth="8"
                 strokeLinecap="round"
                 style={{ pointerEvents: 'stroke' }}
@@ -141,7 +143,8 @@ const EditableObject = ({ object, zoom, onStartDrag, onUpdate, isBeingDragged = 
                 y1="2" 
                 x2="100%" 
                 y2="100%" 
-                stroke="#1f2937" 
+                stroke="#374151" 
+                className="dark:stroke-gray-400"
                 strokeWidth="4"
                 strokeLinecap="round"
                 style={{ pointerEvents: 'none' }}
@@ -157,56 +160,73 @@ const EditableObject = ({ object, zoom, onStartDrag, onUpdate, isBeingDragged = 
           </div>
         );
       
-      case 'rectangle':
+      case 'rectangle': {
+        // Detectar si hay color personalizado
+        const hasCustomBg = !!object.properties?.backgroundColor;
+        const hasCustomBorder = !!object.properties?.color;
         return (
           <div className="w-full h-full relative">
-            <div 
-              className="w-full h-full shadow-md"
+            <div
+              className={`
+                w-full h-full shadow-md
+                ${!hasCustomBg ? 'bg-white dark:bg-gray-700' : ''}
+                ${!hasCustomBorder ? 'border-gray-700 dark:border-gray-300' : ''}
+              `}
               style={{
-                backgroundColor: object.properties?.backgroundColor || 'transparent',
+                backgroundColor: hasCustomBg ? object.properties.backgroundColor : undefined,
                 borderWidth: object.properties?.borderWidth || 8,
                 borderStyle: object.properties?.borderStyle || 'solid',
-                borderColor: object.properties?.color || '#374151',
+                borderColor: hasCustomBorder ? object.properties.color : undefined,
                 borderRadius: object.properties?.borderRadius || 0
               }}
             />
-            {/* Efecto de profundidad en las esquinas */}
-            <div className="absolute top-0 left-0 w-2 h-2 bg-gray-900 opacity-30"></div>
-            <div className="absolute top-0 right-0 w-2 h-2 bg-gray-600 opacity-30"></div>
-            <div className="absolute bottom-0 left-0 w-2 h-2 bg-gray-900 opacity-30"></div>
-            <div className="absolute bottom-0 right-0 w-2 h-2 bg-gray-600 opacity-30"></div>
+            {/* Efectos de esquina */}
+            <div className="absolute top-0 left-0 w-2 h-2 bg-gray-700 dark:bg-gray-200 opacity-40"></div>
+            <div className="absolute top-0 right-0 w-2 h-2 bg-gray-500 dark:bg-gray-100 opacity-40"></div>
+            <div className="absolute bottom-0 left-0 w-2 h-2 bg-gray-700 dark:bg-gray-200 opacity-40"></div>
+            <div className="absolute bottom-0 right-0 w-2 h-2 bg-gray-500 dark:bg-gray-100 opacity-40"></div>
           </div>
         );
-      
+      }
+
       case 'door':
         return (
-          <div className="w-full h-full flex items-center justify-center">
+          <div className="w-full h-full flex items-center justify-center text-black dark:text-white">
             <BsDoorOpen size={24} />
           </div>
         );
       
       case 'text':
         return (
-          <div className="w-full h-full flex items-center justify-center bg-transparent">
-            <div className="relative w-full h-full flex items-center justify-center">
-              <div className="absolute inset-0 bg-blue-50 border border-blue-200 rounded opacity-80"></div>
-              <span 
-                className="relative text-center font-semibold break-words px-2 py-1"
-                style={{ 
-                  fontSize: Math.max(12, (object.properties?.fontSize || 14) / zoom),
-                  lineHeight: '1.2',
-                  color: object.properties?.color || '#1e40af'
-                }}
-              >
-                {object.name || 'Texto'}
-              </span>
-            </div>
+          <div
+            className="p-1 min-w-[20px] min-h-[20px] whitespace-pre-wrap break-words select-none"
+            style={{
+              fontSize: `${object.properties?.fontSize || 16}px`,
+              color: object.properties?.color || '#000000',
+              fontWeight: object.properties?.fontWeight || 'normal',
+              // soporte para backgroundColor
+              backgroundColor: object.properties?.backgroundColor !== 'transparent' 
+                ? object.properties?.backgroundColor 
+                : 'transparent',
+              padding: object.properties?.backgroundColor !== 'transparent' 
+                ? '4px 8px' 
+                : '2px',
+              borderRadius: object.properties?.backgroundColor !== 'transparent' 
+                ? '4px' 
+                : '0',
+              // Sombra cuando hay fondo
+              boxShadow: object.properties?.backgroundColor !== 'transparent' 
+                ? '0 1px 3px rgba(0, 0, 0, 0.1)' 
+                : 'none'
+            }}
+          >
+            {object.name}
           </div>
         );
       
       default:
         return (
-          <div className="w-full h-full bg-gray-200 border border-gray-400 flex items-center justify-center rounded">
+          <div className="w-full h-full bg-gray-200 dark:bg-gray-600 border border-gray-400 dark:border-gray-500 flex items-center justify-center rounded">
             <span style={{ fontSize: Math.max(16, object.size.height * 0.5) }}>
               {objectType?.icon || '?'}
             </span>
@@ -280,7 +300,7 @@ const EditableObject = ({ object, zoom, onStartDrag, onUpdate, isBeingDragged = 
   return (
     <div
       style={style}
-      className={`transition-opacity hover:ring-1 hover:ring-blue-300 select-none ${
+      className={`transition-opacity select-none ${
         isBeingDragged ? 'opacity-30' : ''
       }`}
       onMouseDown={handleMouseDown}
@@ -300,7 +320,7 @@ const EditableObject = ({ object, zoom, onStartDrag, onUpdate, isBeingDragged = 
         >
           <div className="font-medium">{objectType?.name}</div>
           {object.type === 'text' && (
-            <div className="text-xs text-gray-300">"{object.name}"</div>
+            <div className="text-xs text-gray-300">{object.name}</div>
           )}
           <div className="text-xs text-gray-400 mt-1">
             Z-Index: {getZIndex(object.type)} • X: {Math.round(object.position.x)}, Y: {Math.round(object.position.y)}

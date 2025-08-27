@@ -65,10 +65,14 @@ export const createRoomObject = (type, position) => {
         backgroundColor: 'transparent',
         borderRadius: 0
       }),
+      // Propiedades  para texto
       ...(type === 'text' && {
-        fontSize: 14,
+        fontSize: 16, 
         fontWeight: 'normal',
-        textAlign: 'center'
+        textAlign: 'center',
+        color: '#000000', // color por defecto 
+        backgroundColor: 'transparent',
+        padding: 4 
       })
     }
   };

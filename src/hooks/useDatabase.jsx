@@ -32,7 +32,7 @@ export const useFloors = () => {
     const newFloor = {
       id: `planta-${Date.now()}`,
       name: floorData.name,
-      zones: floorData.zones || [{ id: 'zona-principal', name: 'Zona Principal' }]
+      zones: floorData.zones || [{ id: 'zona-inicial', name: 'Inicial' }]
     };
 
     const updatedFloors = [...floors, newFloor];

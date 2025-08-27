@@ -12,7 +12,7 @@ function App() {
   
   const { devices, loading: devicesLoading, addDevice, updateDevicePosition, deleteDevice } = useDevicesDB();
   const { roomObjects, loading: roomObjectsLoading, addRoomObject, updateRoomObject, deleteRoomObject } = useRoomObjectsDB();
-  const { floors, loading: floorsLoading } = useFloors();
+  const { floors, loading: floorsLoading, addFloor, updateFloor, deleteFloor, addZone, updateZone, deleteZone } = useFloors();
   const { dragState, startDrag, updateDrag, endDrag, cancelDrag } = useObjectMovement();
   
   // Inicializar con null hasta que los datos se carguen
@@ -148,7 +148,7 @@ function App() {
   // Considerar todos los loadings
   const loading = devicesLoading || roomObjectsLoading || floorsLoading;
 
-  // Mostrar loading hasta que tengamos ubicación válida
+  // Mostrar loading hasta  ubicación válida
   if (loading || !currentFloor || !currentZone) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -164,13 +164,19 @@ function App() {
         currentZone={currentZone}
         onFloorChange={handleFloorChange}
         onAddDevice={handleAddDevice}
+        floors={floors}
+        addFloor={addFloor}
+        updateFloor={updateFloor}
+        deleteFloor={deleteFloor}
+        addZone={addZone}
+        updateZone={updateZone}
+        deleteZone={deleteZone}
       >
         <Canvas
           devices={currentDevices}
           roomObjects={currentRoomObjects}
           floorId={currentFloor}
           zoneId={currentZone}
-          floors={floors}
           onStartDrag={startDrag}
           onAddRoomObject={addRoomObject}
           onUpdateRoomObject={updateRoomObjectPosition} 

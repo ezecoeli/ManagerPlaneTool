@@ -1,22 +1,30 @@
 import { useState } from 'react';
 import { dbManager } from '../data/databaseManager.js';
-import { BiImport, BiExport } from "react-icons/bi";
-import { MdOutlineMiscellaneousServices } from "react-icons/md";
-import { SiOnlyoffice } from "react-icons/si";
-import { BsDeviceSsd, BsTrash } from "react-icons/bs";
-import { IoHammerOutline } from "react-icons/io5";
+import { BsDatabase, BsDownload, BsUpload, BsTrash, BsFileEarmarkText } from 'react-icons/bs';
 
 const DataManagement = () => {
+  const [showModal, setShowModal] = useState(false);
   const [importing, setImporting] = useState(false);
   const [exportStatus, setExportStatus] = useState('');
 
   const handleExportAll = () => {
     try {
-      dbManager.exportAll();
-      setExportStatus('✅ Datos exportados correctamente');
+      const allData = dbManager.exportAll();
+      const blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `manager-plane-tool-backup-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      setExportStatus('Exportación exitosa');
       setTimeout(() => setExportStatus(''), 3000);
     } catch (error) {
-      setExportStatus('❌ Error al exportar: ' + error.message);
+      console.error('Error al exportar:', error);
+      setExportStatus('Error en la exportación');
       setTimeout(() => setExportStatus(''), 3000);
     }
   };
@@ -26,106 +34,158 @@ const DataManagement = () => {
     if (!file) return;
 
     setImporting(true);
-    
     try {
       await dbManager.importAll(file);
-      
-      if (confirm('✅ Datos importados correctamente.\n¿Recargar la aplicación para aplicar los cambios?')) {
+      setExportStatus('Importación exitosa - Recarga la página');
+      setTimeout(() => {
         window.location.reload();
-      }
+      }, 2000);
     } catch (error) {
-      alert('❌ Error al importar: ' + error.message);
-    } finally {
-      setImporting(false);
-      event.target.value = ''; // Reset input
+      console.error('Error al importar:', error);
+      setExportStatus('Error en la importación');
+      setTimeout(() => setExportStatus(''), 3000);
     }
+    setImporting(false);
+    event.target.value = '';
   };
 
   const handleExportEntity = (entityName) => {
     try {
       dbManager.exportEntity(entityName);
-      setExportStatus(`✅ ${entityName} exportado correctamente`);
+      setExportStatus(`${entityName} exportado exitosamente`);
       setTimeout(() => setExportStatus(''), 3000);
     } catch (error) {
-      setExportStatus('❌ Error al exportar: ' + error.message);
+      console.error(`Error al exportar ${entityName}:`, error);
+      setExportStatus(`Error al exportar ${entityName}`);
       setTimeout(() => setExportStatus(''), 3000);
     }
   };
 
   return (
-    <div className="flex items-center space-x-4">
-      {/* Exportar todo */}
-      <button 
-        onClick={handleExportAll}
-        className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 transition-colors flex items-center space-x-1"
-        title="Exportar todos los datos"
+    <>
+      <button
+        onClick={() => setShowModal(true)}
+        className="px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-600 transition-colors flex items-center space-x-2"
+        title="Gestión de datos"
       >
-        <span><BiExport /></span>
-        <span>Exportar Datos</span>
+        <BsDatabase className="w-4 h-4" />
+        <span>Exportar / Importar</span>
       </button>
-      
-      {/* Importar */}
-      <label className="px-3 py-1 bg-green-700 text-white rounded text-sm hover:bg-green-600 cursor-pointer transition-colors flex items-center space-x-1">
-        <span><BiImport /></span>
-        <span>{importing ? 'Importando...' : 'Importar Datos'}</span>
-        <input 
-          type="file" 
-          accept=".json" 
-          onChange={handleImportAll} 
-          className="hidden"
-          disabled={importing}
-        />
-      </label>
 
-      {/* Dropdown para exportaciones específicas */}
-      <div className="relative group">
-        <button className="px-3 py-1 bg-orange-700 text-white rounded text-sm hover:bg-gray-600 transition-colors flex items-center space-x-1">
-          <span><MdOutlineMiscellaneousServices /></span>
-          <span>Avanzado</span>
-          <span className="text-xs">▼</span>
-        </button>
-        
-        <div className="absolute top-full right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 min-w-[200px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-          <button
-            onClick={() => handleExportEntity('floors')}
-            className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
-          >
-            <SiOnlyoffice /> Exportar Plantas
-          </button>
-          <button
-            onClick={() => handleExportEntity('devices')}
-            className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
-          >
-            <BsDeviceSsd /> Exportar Dispositivos
-          </button>
-          <button
-            onClick={() => handleExportEntity('roomObjects')}
-            className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
-          >
-            <IoHammerOutline /> Exportar Objetos
-          </button>
-          <div className="border-t border-gray-200 my-1"></div>
-          <button
-            onClick={() => {
-              if (confirm('⚠️ ¿Estás seguro de que quieres borrar TODOS los datos?\n\nEsta acción no se puede deshacer.')) {
-                dbManager.clearAll();
-                window.location.reload();
-              }
-            }}
-            className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center space-x-2"
-          >
-            <BsTrash /> Limpiar Todo
-          </button>
-        </div>
-      </div>
+      {showModal && (
+        <div className="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 transition-colors duration-200">
+            <div className="p-6">
+              {/* Header */}
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100 flex items-center">
+                  <BsDatabase className="w-6 h-6 mr-2" />
+                  Gestión de Datos
+                </h2>
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
 
-      {/* Status */}
-      {exportStatus && (
-        <div className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded">
-          {exportStatus}
+              {/* Exportar/Importar todo */}
+              <div className="space-y-4">
+                <div className="border border-gray-200 dark:border-gray-600 rounded-lg p-4 bg-gray-50 dark:bg-gray-700 transition-colors duration-200">
+                  <h3 className="text-lg font-medium text-gray-800 dark:text-gray-100 mb-3">
+                    Copia de Seguridad Completa
+                  </h3>
+                  
+                  <div className="space-y-3">
+                    <button
+                      onClick={handleExportAll}
+                      className="w-full px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors flex items-center justify-center space-x-2"
+                    >
+                      <BsDownload className="w-4 h-4" />
+                      <span>Exportar Todo</span>
+                    </button>
+
+                    <div className="relative">
+                      <input
+                        type="file"
+                        accept=".json"
+                        onChange={handleImportAll}
+                        disabled={importing}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                      />
+                      <button
+                        disabled={importing}
+                        className="w-full px-4 py-2 bg-orange-600 dark:bg-orange-700 text-white rounded-lg hover:bg-orange-700 dark:hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center space-x-2"
+                      >
+                        <BsUpload className="w-4 h-4" />
+                        <span>{importing ? 'Importando...' : 'Importar Todo'}</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Exportaciones individuales */}
+                <div className="border border-gray-200 dark:border-gray-600 rounded-lg p-4 transition-colors duration-200">
+                  <h3 className="text-lg font-medium text-gray-800 dark:text-gray-100 mb-3">
+                    Exportar por Categoría:
+                  </h3>
+                  
+                  <div className="grid grid-cols-1 gap-2">
+                    <button
+                      onClick={() => handleExportEntity('devices')}
+                      className="px-3 py-2 bg-gray-600 dark:bg-gray-700 text-white rounded hover:bg-gray-700 dark:hover:bg-gray-600 transition-colors flex items-center space-x-2 text-sm"
+                    >
+                      <BsFileEarmarkText className="w-4 h-4" />
+                      <span>Dispositivos</span>
+                    </button>
+                    
+                    <button
+                      onClick={() => handleExportEntity('roomObjects')}
+                      className="px-3 py-2 bg-gray-600 dark:bg-gray-700 text-white rounded hover:bg-gray-700 dark:hover:bg-gray-600 transition-colors flex items-center space-x-2 text-sm"
+                    >
+                      <BsFileEarmarkText className="w-4 h-4" />
+                      <span>Objetos de Habitación</span>
+                    </button>
+                    
+                    <button
+                      onClick={() => handleExportEntity('floors')}
+                      className="px-3 py-2 bg-gray-600 dark:bg-gray-700 text-white rounded hover:bg-gray-700 dark:hover:bg-gray-600 transition-colors flex items-center space-x-2 text-sm"
+                    >
+                      <BsFileEarmarkText className="w-4 h-4" />
+                      <span>Zonas y sub-zonas</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Status */}
+                {exportStatus && (
+                  <div className={`p-3 rounded-lg text-sm ${
+                    exportStatus.includes('Error') 
+                      ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300' 
+                      : 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
+                  } transition-colors duration-200`}>
+                    {exportStatus}
+                  </div>
+                )}
+              </div>
+
+              {/* Botón cerrar */}
+              <div className="mt-6 flex justify-end">
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="px-4 py-2 bg-gray-600 dark:bg-gray-700 text-white rounded-lg hover:bg-gray-700 dark:hover:bg-gray-600 transition-colors"
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 

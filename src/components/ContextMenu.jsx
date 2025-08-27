@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BsPin, BsPen, BsTrash, BsDeviceSsd } from "react-icons/bs";
-import { IoHammerOutline } from "react-icons/io5";
+import { BsPencil, BsTrash } from 'react-icons/bs';
 
 const ContextMenu = ({ x, y, object, onEdit, onDelete, onClose }) => {
   const [isVisible, setIsVisible] = useState(false);
@@ -8,92 +7,73 @@ const ContextMenu = ({ x, y, object, onEdit, onDelete, onClose }) => {
   useEffect(() => {
     setIsVisible(true);
     
-    const handleClickOutside = (e) => {
+    const handleClickOutside = () => {
       onClose();
     };
 
-    const handleEscape = (e) => {
+    const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
         onClose();
       }
     };
 
-    setTimeout(() => {
-      document.addEventListener('click', handleClickOutside);
-      document.addEventListener('keydown', handleEscape);
-    }, 100);
-
+    document.addEventListener('click', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+    
     return () => {
       document.removeEventListener('click', handleClickOutside);
-      document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener('keydown', handleKeyDown);
     };
   }, [onClose]);
 
   const isDevice = object.hasOwnProperty('status');
-  const isRoomObject = object.hasOwnProperty('size');
 
   const handleAction = (action) => {
-    setIsVisible(false);
-    setTimeout(() => {
-      action();
-      onClose();
-    }, 150);
+    if (action === 'edit') {
+      onEdit(object);
+    } else if (action === 'delete') {
+      onDelete(object);
+    }
+    onClose();
   };
 
   return (
     <div
-      className={`fixed bg-white rounded-lg shadow-xl border border-gray-200 py-2 min-w-[160px] transition-all duration-150 ${
+      className={`fixed z-50 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg py-2 transition-all duration-200 ${
         isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
       }`}
       style={{
-        left: x,
-        top: y,
-        zIndex: 10000,
+        left: `${x}px`,
+        top: `${y}px`,
         transformOrigin: 'top left'
       }}
       onClick={(e) => e.stopPropagation()}
     >
-      {/* Header con info del objeto */}
-      <div className="px-3 py-2 border-b border-gray-100">
-        <div className="text-sm font-medium text-gray-800">
-          {isDevice ? <BsDeviceSsd /> : <IoHammerOutline />}
-          {isDevice ? ' Dispositivo' : ' Objeto'}
+      {/* Header con información del objeto */}
+      <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-600">
+        <div className="text-sm font-medium text-gray-800 dark:text-gray-100">
+          {object.name || 'Sin nombre'}
         </div>
-        <div className="text-xs text-gray-500 truncate max-w-[140px]">
-          {object.name}
+        <div className="text-xs text-gray-500 dark:text-gray-400">
+          {isDevice ? `Dispositivo (${object.type})` : `Objeto (${object.type})`}
         </div>
       </div>
 
-      {/* Opciones */}
+      {/* Opciones del menú */}
       <div className="py-1">
-        
-        {isRoomObject && object.type === 'text' && (
-          <>
-            <button
-              onClick={() => handleAction(() => onEdit(object))}
-              className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center space-x-2"
-            >
-              <span><BsPen /></span>
-              <span>Editar texto</span>
-            </button>
-            <div className="border-t border-gray-100 my-1"></div>
-          </>
-        )}
-
-        {isDevice && (
-          <div className="px-3 py-2">
-            <div className="text-xs text-gray-400 text-center">
-              <BsPin /> Arrastra para mover
-            </div>
-            <div className="border-t border-gray-100 my-2"></div>
-          </div>
-        )}
-
         <button
-          onClick={() => handleAction(() => onDelete(object))}
-          className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center space-x-2"
+          onClick={() => handleAction('edit')}
+          className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center space-x-2"
         >
-          <span><BsTrash /></span>
+          <BsPencil className="w-4 h-4" />
+          <span>Editar</span>
+        </button>
+        
+        <button
+          onClick={() => handleAction('delete')}
+          className="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200 flex items-center space-x-2"
+        >
+          <BsTrash className="w-4 h-4" />
           <span>Eliminar</span>
         </button>
       </div>
