@@ -36,9 +36,9 @@ const Sidebar = ({ currentFloor, currentZone, onFloorChange, onAddDevice, floors
   };
 
   return (
-    <div className="h-full flex flex-col bg-white dark:bg-gray-700 transition-colors duration-200">
+    <div className="h-full flex flex-col bg-gray-200 dark:bg-gray-700 transition-colors duration-200">
       {/* Header del Sidebar */}
-      <div className="p-3 border-b border-gray-200 dark:border-gray-500">
+      <div className="p-3 border-b border-gray-200 dark:border-gray-700">
         <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Zonas disponibles:</h2>
         <p className="text-sm text-gray-600 dark:text-gray-400">Selecciona una para trabajar</p>
       </div>
@@ -47,24 +47,24 @@ const Sidebar = ({ currentFloor, currentZone, onFloorChange, onAddDevice, floors
       <div className="flex-1 overflow-y-auto p-4">
         <div className="space-y-2">
           {floors.map((floor) => (
-            <div key={floor.id} className="border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-700/50 transition-colors duration-200">
+            <div key={floor.id} className="border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-500/50 transition-colors duration-200">
               {/* Header de la planta */}
               <button
                 onClick={() => toggleFloor(floor.id)}
                 className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-gray-100 dark:hover:bg-gray-600/50 rounded-lg transition-colors"
               >
                 <div>
-                  <h3 className="font-medium text-gray-800 dark:text-gray-100">
+                  <h3 className="font-medium text-black dark:text-gray-100">
                     {getDisplayName(floor.name)}
                   </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
                     {Array.isArray(floor.zones) ? floor.zones.length : 0} sub-zona{(Array.isArray(floor.zones) ? floor.zones.length : 0) !== 1 ? 's' : ''}
                   </p>
                 </div>
                 {expandedFloors[floor.id] ? (
-                  <BsChevronDown className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                  <BsChevronDown className="w-4 h-4 text-gray-500 dark:text-gray-300" />
                 ) : (
-                  <BsChevronRight className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                  <BsChevronRight className="w-4 h-4 text-gray-500 dark:text-gray-300" />
                 )}
               </button>
 
@@ -82,7 +82,7 @@ const Sidebar = ({ currentFloor, currentZone, onFloorChange, onAddDevice, floors
                         className={`w-full text-left px-3 py-2 rounded-lg transition-colors text-sm ${
                           isActive
                             ? `${zoneColorClass} ring-2 ring-blue-500 dark:ring-blue-400`
-                            : `bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-500 border border-gray-200 dark:border-gray-600`
+                            : `bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-500 border border-gray-200 dark:border-gray-600`
                         }`}
                       >
                         <div className="flex items-center justify-between">

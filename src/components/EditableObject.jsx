@@ -189,7 +189,7 @@ const EditableObject = ({ object, zoom, onStartDrag, onUpdate, isBeingDragged = 
       case 'door':
         return (
           <div className="w-full h-full flex items-center justify-center text-black dark:text-white">
-            <BsDoorOpen size={28} />
+            <BsDoorOpen size={36} />
           </div>
         );
       

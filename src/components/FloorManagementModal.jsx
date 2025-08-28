@@ -189,7 +189,7 @@ const FloorManagementModal = ({
                         <div className="flex items-center justify-between mb-3">
                           <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center">
                             <BsGrid className="w-4 h-4 mr-2" />
-                            Sub-zonas actuales
+                            Sub-zonas existentes
                           </h5>
                         </div>
 

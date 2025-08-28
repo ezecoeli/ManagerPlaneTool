@@ -5,7 +5,6 @@ export const DEVICE_TYPES = {
   desktop: {
     icon: BsPcDisplay,
     name: "PC Escritorio"
-    // ❌ Eliminamos fields predefinidos
   },
   laptop: {
     icon: BsLaptop,

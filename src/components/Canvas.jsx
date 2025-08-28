@@ -1,12 +1,13 @@
 import { useState } from 'react';
-import { createRoomObject } from '../data/roomTypes.js';
+import { createRoomObject,ROOM_OBJECT_TYPES } from '../data/roomTypes.js';
 import Device from './Device.jsx';
 import EditableObject from './EditableObject.jsx';
 import TextModal from './TextModal.jsx';
 import ContextMenu from './ContextMenu.jsx';
 import ConfirmDeleteModal from './ConfirmDeleteModal.jsx';
-import { BsPen, BsDoorOpen, BsTextLeft } from "react-icons/bs";
+import { BsPen, BsDoorOpen, BsTextLeft, BsZoomIn, BsZoomOut } from "react-icons/bs";
 import { GiCrane, GiPositionMarker } from "react-icons/gi";
+import DeviceEditModal from './DeviceEditModal.jsx';
 
 const Canvas = ({ 
   devices, 
@@ -16,7 +17,8 @@ const Canvas = ({
   onStartDrag, 
   onAddRoomObject,
   onUpdateRoomObject,
-  onDeleteObject, 
+  onDeleteObject,
+  onUpdateDevice,
   dragState 
 }) => {
   const [zoom, setZoom] = useState(1);
@@ -30,6 +32,10 @@ const Canvas = ({
 
   const [editingText, setEditingText] = useState(null);
   const [showEditTextModal, setShowEditTextModal] = useState(false);
+
+  // estados para edición de dispositivos
+  const [editingDevice, setEditingDevice] = useState(null);
+  const [showEditDeviceModal, setShowEditDeviceModal] = useState(false);
 
   const currentRoomObjects = roomObjects;
 
@@ -49,11 +55,11 @@ const Canvas = ({
   const editOptions = [
     { id: 'wall-horizontal', icon: '━', label: 'Pared Horizontal' },
     { id: 'wall-vertical', icon: '┃', label: 'Pared Vertical' },
-    { id: 'wall-diagonal', icon: '╱', label: 'Pared Diagonal ' },
+    { id: 'wall-diagonal', icon: '╱', label: 'Pared Diagonal' },
     { id: 'wall-diagonal-reverse', icon: '╲', label: 'Pared Diagonal' },
-    { id: 'rectangle', icon: '▢', label: 'Cuadrado/Rectángulo' },
-    { id: 'door', icon: BsDoorOpen, label: 'Añadir Puerta', isReactIcon: true },
-    { id: 'text', icon: BsTextLeft , label: 'Añadir Texto', isReactIcon: true }
+    { id: 'rectangle', icon: '▢', label: 'Rectángulo' },
+    { id: 'door', icon: BsDoorOpen, label: 'Puerta', isReactIcon: true },
+    { id: 'text', icon: BsTextLeft , label: 'Texto', isReactIcon: true }
   ];
 
   const handleEditOption = (optionId) => {
@@ -135,18 +141,42 @@ const Canvas = ({
     setContextMenu({ show: false, x: 0, y: 0, object: null });
   };
 
-  // Función de edición 
+  // Función de edición mejorada
   const handleEditObject = (object) => {
     handleCloseContextMenu();
     
-    // Solo permitir edición de objetos de texto
-    if (object.type === 'text') {
+    // Verificar si es un dispositivo
+    const isDevice = object.hasOwnProperty('status') || 
+                     object.hasOwnProperty('customProperties') ||
+                     !ROOM_OBJECT_TYPES[object.type];
+    
+    if (isDevice) {
+      // Editar dispositivo
+      setEditingDevice(object);
+      setShowEditDeviceModal(true);
+    } else if (object.type === 'text') {
+      // Editar texto
       setEditingText(object);
       setShowEditTextModal(true);
     } else {
       // Para otros tipos de objeto, mostrar mensaje
       console.log('Este tipo de objeto no es editable:', object.type);
     }
+  };
+
+  // Función para guardar cambios de dispositivo
+  const handleEditDeviceSave = (updatedDevice) => {
+    if (onUpdateDevice) {
+      onUpdateDevice(updatedDevice);
+    }
+    setShowEditDeviceModal(false);
+    setEditingDevice(null);
+  };
+
+  // Función para cancelar edición de dispositivo
+  const handleEditDeviceCancel = () => {
+    setShowEditDeviceModal(false);
+    setEditingDevice(null);
   };
 
   const handleDeleteRequest = (object) => {
@@ -171,7 +201,7 @@ const Canvas = ({
   return (
     <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900 transition-colors duration-200" data-canvas-container>
       {/* Canvas Header */}
-      <div className="bg-white dark:bg-gray-700 border-b border-gray-300 dark:border-gray-500 px-4 py-3 flex items-center justify-between transition-colors duration-200">
+      <div className="bg-gray-100 dark:bg-gray-800 px-4 py-3 flex items-center justify-between transition-colors duration-200">
         <div>
           <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
             Plano - {floorId} / {zoneId}
@@ -186,7 +216,7 @@ const Canvas = ({
           <div className="relative">
             <button
               onClick={() => setShowEditMenu(!showEditMenu)}
-              className="px-4 py-2 bg-purple-600 dark:bg-purple-700 text-white rounded-lg hover:bg-purple-700 dark:hover:bg-purple-600 flex items-center space-x-2 transition-colors duration-200"
+              className="px-4 py-2 bg-purple-700 dark:bg-purple-900 text-white rounded-lg hover:bg-purple-700 dark:hover:bg-purple-600 flex items-center space-x-2 transition-colors duration-200"
               disabled={dragState?.isDragging}
             >
               <BsPen className="w-4 h-4" />
@@ -221,31 +251,42 @@ const Canvas = ({
               </div>
             )}
           </div>
-
-          <div className="flex items-center space-x-2">
+          
+          {/* controles de zoom */}
+          <div className="flex items-center space-x-1 bg-white/80 dark:bg-gray-800/80 border border-gray-300 dark:border-gray-700 rounded-xl px-0.5 py-0.5 shadow-sm backdrop-blur-sm">
+            {/* Botón Zoom Out con icono */}
             <button
               onClick={handleZoomOut}
-              className="p-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg text-gray-700 dark:text-gray-200 transition-colors duration-200"
-              title="Alejar"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-gray-700 dark:text-gray-200 transition-colors duration-200 flex items-center justify-center"
+              title="Alejar (Zoom Out)"
               disabled={dragState?.isDragging}
             >
-              <span className="text-lg">−</span>
+              <BsZoomOut className="w-4 h-4" />
             </button>
-            <span className="text-sm text-gray-600 dark:text-gray-400 min-w-[60px] text-center">
+            
+            {/* Porcentaje de zoom */}
+            <span className="text-sm text-gray-600 dark:text-gray-400 min-w-[40px] text-center font-medium">
               {Math.round(zoom * 100)}%
             </span>
+            
+            {/* Botón Zoom In con icono */}
             <button
               onClick={handleZoomIn}
-              className="p-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg text-gray-700 dark:text-gray-200 transition-colors duration-200"
-              title="Acercar"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-gray-700 dark:text-gray-200 transition-colors duration-200 flex items-center justify-center"
+              title="Acercar (Zoom In)"
               disabled={dragState?.isDragging}
             >
-              <span className="text-lg">+</span>
+              <BsZoomIn className="w-4 h-4" />
             </button>
+            
+            {/* Separador visual */}
+            <span className="mx-1 h-5 w-px bg-gray-300 dark:bg-gray-700 rounded" />
+
+            {/* Botón restablecer */}
             <button
               onClick={handleResetView}
-              className="px-3 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg text-sm text-gray-700 dark:text-gray-200 transition-colors duration-200"
-              title="Restablecer vista"
+              className="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-sm text-gray-700 dark:text-gray-200 transition-colors duration-200"
+              title="Restablecer vista (100%)"
               disabled={dragState?.isDragging}
             >
               Restablecer
@@ -399,6 +440,15 @@ const Canvas = ({
           onSave={handleEditTextSave}
           onCancel={handleEditTextCancel}
           isEditing={true}
+        />
+      )}
+
+      {/* Modal para editar dispositivo existente */}
+      {editingDevice && (
+        <DeviceEditModal
+          device={editingDevice}
+          onSave={handleEditDeviceSave}
+          onCancel={handleEditDeviceCancel}
         />
       )}
 

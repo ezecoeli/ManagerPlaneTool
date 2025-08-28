@@ -18,14 +18,15 @@ export const ROOM_OBJECT_TYPES = {
     defaultSize: { width: 80, height: 80 }
   },
   'wall-diagonal-reverse': {
-    name: 'Pared Diagonal Inversa',
+    name: 'Pared Diagonal',
     icon: '╲',
     editable: false,
     defaultSize: { width: 80, height: 80 } 
   },
   'rectangle': {
-    name: 'Cuadrado/Rectángulo',
+    name: 'Rectángulo',
     icon: '▢',
+    editable: false,
     defaultSize: { width: 300, height: 250 },
   },
   'door': {
@@ -37,7 +38,7 @@ export const ROOM_OBJECT_TYPES = {
   'text': {
     name: 'Etiqueta de Texto',
     icon: '📝',
-    editable: false,
+    editable: true,
     defaultSize: { width: 120, height: 40 }
   }
 };

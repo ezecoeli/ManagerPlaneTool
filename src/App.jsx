@@ -10,21 +10,18 @@ import { FiMove } from 'react-icons/fi';
 
 function App() {
   
-  const { devices, loading: devicesLoading, addDevice, updateDevicePosition, deleteDevice } = useDevicesDB();
+  const { devices, loading: devicesLoading, addDevice, updateDevice, updateDevicePosition, deleteDevice } = useDevicesDB();
   const { roomObjects, loading: roomObjectsLoading, addRoomObject, updateRoomObject, deleteRoomObject } = useRoomObjectsDB();
   const { floors, loading: floorsLoading, addFloor, updateFloor, deleteFloor, addZone, updateZone, deleteZone } = useFloors();
   const { dragState, startDrag, updateDrag, endDrag, cancelDrag } = useObjectMovement();
   
-  // Inicializar con null hasta que los datos se carguen
   const [currentFloor, setCurrentFloor] = useState(null);
   const [currentZone, setCurrentZone] = useState(null);
   
-  // Estados para los modales
   const [showDeviceTypeSelector, setShowDeviceTypeSelector] = useState(false);
   const [showDeviceInfoModal, setShowDeviceInfoModal] = useState(false);
   const [selectedDeviceType, setSelectedDeviceType] = useState(null);
 
-  // Efecto para inicializar ubicación con los primeros datos disponibles
   useEffect(() => {
     if (floors.length > 0 && !currentFloor) {
       const firstFloor = floors[0];
@@ -38,7 +35,6 @@ function App() {
     }
   }, [floors, currentFloor]);
 
-  // Validar que currentFloor y currentZone existan antes de filtrar
   const currentRoomObjects = roomObjects.filter(obj => 
     obj.floor === currentFloor && obj.zone === currentZone
   );
@@ -47,7 +43,6 @@ function App() {
     device.floor === currentFloor && device.zone === currentZone
   );
 
-  // detectar el tipo de objeto
   const isDevice = (object) => {
     return object.hasOwnProperty('status');
   };
@@ -56,7 +51,6 @@ function App() {
     return object.hasOwnProperty('size');
   };
 
-  // Funciones de eliminación
   const handleDeleteObject = (object) => {
     if (isDevice(object)) {
       deleteDevice(object.id);
@@ -65,12 +59,6 @@ function App() {
     }
   };
 
-  // Función para actualizar posición de objetos de habitación
-  const updateRoomObjectPosition = (objectId, newPosition) => {
-    updateRoomObject(objectId, { position: newPosition });
-  };
-
-  // Eventos globales de mouse para el drag
   useEffect(() => {
     const handleMouseMove = (e) => {
       if (dragState.isDragging) {
@@ -98,7 +86,6 @@ function App() {
       }
     };
 
-    // Agregar listeners globalmente
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
     document.addEventListener('keydown', handleKeyDown);
@@ -145,10 +132,8 @@ function App() {
     setSelectedDeviceType(null);
   };
 
-  // Considerar todos los loadings
   const loading = devicesLoading || roomObjectsLoading || floorsLoading;
 
-  // Mostrar loading hasta  ubicación válida
   if (loading || !currentFloor || !currentZone) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -156,6 +141,12 @@ function App() {
       </div>
     );
   }
+
+  // actualiza las propiedades del dispositivo y la posición
+  const handleUpdateDevice = (updatedDevice) => {
+    updateDevice(updatedDevice.id, updatedDevice);
+    console.log('Dispositivo actualizado:', updatedDevice.name, updatedDevice);
+  };
 
   return (
     <div className="relative">
@@ -179,13 +170,13 @@ function App() {
           zoneId={currentZone}
           onStartDrag={startDrag}
           onAddRoomObject={addRoomObject}
-          onUpdateRoomObject={updateRoomObjectPosition} 
+          onUpdateRoomObject={updateRoomObject} 
           onDeleteObject={handleDeleteObject}
+          onUpdateDevice={handleUpdateDevice}
           dragState={dragState}
         />
       </MainLayout>
 
-      {/* VISTA PREVIA DE ARRASTRE */}
       {dragState.isDragging && (
         <div
           className="fixed pointer-events-none z-50"
@@ -204,7 +195,6 @@ function App() {
         </div>
       )}
 
-      {/* Modales */}
       {showDeviceTypeSelector && (
         <DeviceTypeSelector
           onSelectType={handleDeviceTypeSelect}
