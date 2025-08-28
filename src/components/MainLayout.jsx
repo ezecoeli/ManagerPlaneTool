@@ -3,7 +3,8 @@ import Sidebar from './Sidebar.jsx';
 import FloorManagementModal from './FloorManagementModal.jsx';
 import DataManagement from './DataManagement.jsx'; 
 import { useTheme } from '../hooks/useTheme.jsx';
-import logo from '../assets/images/icon.png';
+import logo from '../assets/images/logo.png';
+import logoWhite from '../assets/images/logo-white.png';
 import { BsTools, BsMoon, BsSun } from "react-icons/bs";
 
 const MainLayout = ({
@@ -26,20 +27,16 @@ const MainLayout = ({
   return (
     <div className="h-screen flex flex-col bg-gray-100 dark:bg-gray-900 transition-colors duration-200">
       {/* Header */}
-      <header className="bg-gray-300 dark:bg-black shadow-sm border-b border-gray-200 dark:border-gray-700 transition-colors duration-200">
+      <header className="bg-gray-400 dark:bg-black shadow-sm border-b border-gray-200 dark:border-gray-700 transition-colors duration-200">
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <img 
-                src={logo} 
-                alt="Manager Plane Tool Logo" 
-                className="w-8 h-8 object-contain"
-              />
-              <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100 transition-colors duration-200">
-                ManagerPlaneTool
-              </h1>
-            </div>
             
+            <img 
+              src={theme === 'dark' ? logoWhite : logo}
+              alt="Manager Plane Tool Logo" 
+              className="flex w-25 h-20 object-contain"
+            />
+
             <div className="flex items-center space-x-4">
               {/* Botón de cambio de tema */}
               <button
@@ -94,6 +91,8 @@ const MainLayout = ({
             currentZone={currentZone}
             onFloorChange={onFloorChange}
             onAddDevice={onAddDevice}
+            addFloor={addFloor}
+            addZone={addZone}
             floors={floors}
           />
         </div>

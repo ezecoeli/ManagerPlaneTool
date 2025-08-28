@@ -17,17 +17,17 @@ const ConfirmDeleteZoneModal = ({
   const getDeleteInfo = () => {
     if (isFloor) {
       return {
-        icon: <BsBuildings />,
-        title: 'Eliminar Planta',
+        icon: <BsBuildings className="text-black dark:text-white" />,
+        title: 'Eliminar Zona',
         name: item.name,
-        description: `Esta planta contiene ${item.zones?.length || 0} zona${item.zones?.length !== 1 ? 's' : ''}`,
-        warning: 'Se eliminarán también todos los dispositivos y objetos asociados a esta planta.',
+        description: `Esta zona contiene ${item.zones?.length || 0} sub-zona${item.zones?.length !== 1 ? 's' : ''}`,
+        warning: 'Se eliminarán también todos los dispositivos y objetos asociados a esta zona.',
         warningLevel: 'high'
       };
     } else if (isZone) {
       return {
         icon: <BsPin />,
-        title: 'Eliminar Zona',
+        title: 'Eliminar sub-zona',
         name: item.name,
         description: `Zona de la planta: ${floorName}`,
         warning: 'Se eliminarán también todos los dispositivos y objetos asociados a esta zona.',
@@ -53,24 +53,24 @@ const ConfirmDeleteZoneModal = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]">
-      <div className="bg-white rounded-lg shadow-xl p-6 w-[500px] max-w-[90vw]">
+      <div className="bg-white dark:bg-gray-700 rounded-lg shadow-xl p-6 w-[500px] max-w-[90vw]">
         {/* Header */}
         <div className="flex items-center space-x-3 mb-4">
           <div className="text-4xl">{icon}</div>
           <div>
-            <h3 className="text-xl font-semibold text-gray-800">
+            <h3 className="text-xl font-semibold text-black dark:text-white">
               {title}
             </h3>
-            <p className="text-sm text-gray-600">
-              Esta acción no se puede deshacer
+            <p className="text-sm text-gray-600 dark:text-gray-300">
+              * Esta acción no se puede deshacer.
             </p>
           </div>
         </div>
 
         {/* Información del elemento */}
-        <div className="bg-gray-50 rounded-lg p-4 mb-4">
-          <div className="font-medium text-gray-800 text-lg mb-1">{name}</div>
-          <div className="text-sm text-gray-600">{description}</div>
+        <div className="bg-gray-50 dark:bg-gray-400 rounded-lg p-4 mb-4">
+          <div className="font-medium text-gray-800 dark:text-black text-lg mb-1">{name}</div>
+          <div className="text-sm text-gray-600 dark:text-gray-800">{description}</div>
         </div>
 
         {/* Warning */}
@@ -86,11 +86,11 @@ const ConfirmDeleteZoneModal = ({
           </div>
         )}
 
-        {/* Confirmation Input - Solo para plantas */}
+        {/* Confirmation Input - Solo para zonas */}
         {isFloor && (
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Para confirmar, escribe el nombre de la planta:
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              - Para confirmar, escribe el nombre de la zona:
             </label>
             <input
               type="text"
@@ -111,11 +111,11 @@ const ConfirmDeleteZoneModal = ({
           </button>
           <button
             onClick={() => {
-              // Para plantas, verificar que escribió el nombre correctamente
+              // verificar que escribió el nombre correctamente
               if (isFloor) {
                 const input = document.getElementById('confirm-delete-input');
                 if (input.value.trim() !== name) {
-                  alert('El nombre no coincide. Por favor, escribe el nombre exacto de la planta.');
+                  alert('El nombre no coincide. Por favor, escribe el nombre exacto.');
                   return;
                 }
               }
@@ -127,7 +127,7 @@ const ConfirmDeleteZoneModal = ({
                 : 'bg-orange-600 hover:bg-orange-700'
             }`}
           >
-            {isFloor ? 'Eliminar Planta' : 'Eliminar Zona'}
+            {isFloor ? 'Eliminar Zona' : 'Eliminar Sub-Zona'}
           </button>
         </div>
       </div>
