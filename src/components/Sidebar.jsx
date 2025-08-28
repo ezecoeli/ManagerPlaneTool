@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { BsPlus, BsPlusCircle, BsChevronDown, BsChevronRight } from 'react-icons/bs';
 import ModalSidebar from './ModalSidebar.jsx';
+import { BiSolidChevronsRight, BiSolidChevronsLeft } from "react-icons/bi";
+
 
 const Sidebar = ({
   currentFloor,
@@ -9,7 +11,9 @@ const Sidebar = ({
   onAddDevice,
   addFloor, 
   addZone,
-  floors = []
+  floors = [],
+  collapsed = false,
+  onToggleCollapse
 }) => {
   const [expandedFloors, setExpandedFloors] = useState({
     [currentFloor]: true
@@ -69,7 +73,19 @@ const Sidebar = ({
     <div className="h-full flex flex-col bg-gray-200 dark:bg-gray-700 transition-colors duration-200">
       {/* Header del Sidebar */}
       <div className="justify-center p-3 flex items-center">
-        <h1 className="text-xl font-black text-gray-800 dark:text-gray-100">ZONAS DISPONIBLES</h1>
+        {!collapsed && (
+          <h1 className="text-xl font-black text-gray-800 dark:text-gray-100 flex-1">ZONAS DISPONIBLES</h1>
+        )}
+        <button
+          onClick={onToggleCollapse}
+          className="rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+          title={collapsed ? "Mostrar Sidebar" : "Ocultar Sidebar"}
+        >
+          {collapsed
+            ? <BiSolidChevronsRight className="w-5 h-5 text-gray-800 dark:text-gray-300" />
+            : <BiSolidChevronsLeft className="w-5 h-5 text-gray-800 dark:text-gray-300" />
+          }
+        </button>
       </div>
       
       {/* Modal para añadir zona o sub-zona */}
@@ -82,105 +98,111 @@ const Sidebar = ({
         onCancel={handleModalCancel}
       />
 
-      {/* Lista de plantas y zonas */}
-      <div className="flex-1 overflow-y-auto p-4">
-        <div className="space-y-2">
-          {floors.map((floor) => (
-            <div key={floor.id} className="border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-300 dark:bg-gray-500/50 transition-colors duration-200">
-              {/* Header zonas*/}
-              <div className="w-full px-4 py-3 flex items-center justify-between text-left rounded-lg transition-colors">
-                <div className="flex items-center space-x-2">
-                  <h3 className="font-medium flex rounded-lg w-full px-3 py-2 bg-teal-800 dark:text-white">
-                    {getDisplayName(floor.name)}
-                  </h3>
+      {/* Lista de plantas y zonas  si no está colapsado */}
+      {!collapsed && (
+        <div className="flex-1 overflow-y-auto p-4">
+          <div className="space-y-2">
+            {floors.map((floor) => (
+              <div key={floor.id} className="border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-300 dark:bg-gray-500/50 transition-colors duration-200">
+                {/* Header zonas*/}
+                <div className="w-full px-4 py-3 flex items-center justify-between text-left rounded-lg transition-colors">
+                  <div className="flex items-center space-x-2">
+                    <h3 className="font-medium flex rounded-lg w-full px-3 py-2 bg-teal-800 dark:text-white">
+                      {getDisplayName(floor.name)}
+                    </h3>
+                    <button
+                      onClick={() => handleAddSubZone(floor.id)}
+                      className="p-1 rounded-full bg-rose-500 text-white hover:bg-gray-900 transition-colors"
+                      title="Añadir sub-zona"
+                    >
+                      <BsPlus className="w-4 h-4" />
+                    </button>
+                  </div>
                   <button
-                    onClick={() => handleAddSubZone(floor.id)}
-                    className="p-1 rounded-full bg-rose-500 text-white hover:bg-gray-900 transition-colors"
-                    title="Añadir sub-zona"
+                    onClick={() => toggleFloor(floor.id)}
+                    className="ml-2 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                    title={expandedFloors[floor.id] ? "Colapsar" : "Expandir"}
                   >
-                    <BsPlus className="w-4 h-4" />
+                    {expandedFloors[floor.id] ? (
+                      <BsChevronDown className="w-4 h-4 text-gray-800 dark:text-gray-300" />
+                    ) : (
+                      <BsChevronRight className="w-4 h-4 text-gray-800 dark:text-gray-300" />
+                    )}
                   </button>
                 </div>
-                <button
-                  onClick={() => toggleFloor(floor.id)}
-                  className="ml-2 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-                  title={expandedFloors[floor.id] ? "Colapsar" : "Expandir"}
-                >
-                  {expandedFloors[floor.id] ? (
-                    <BsChevronDown className="w-4 h-4 text-gray-500 dark:text-gray-300" />
-                  ) : (
-                    <BsChevronRight className="w-4 h-4 text-gray-500 dark:text-gray-300" />
-                  )}
-                </button>
+
+                {/* Lista de zonas */}
+                {expandedFloors[floor.id] && Array.isArray(floor.zones) && (
+                  <div className="px-4 pb-3 space-y-2">
+                    {floor.zones.map((zone, zoneIndex) => {
+                      const isActive = currentFloor === floor.id && currentZone === zone.id;
+                      const zoneColorClass = getZoneColor(zoneIndex);
+                      
+                      return (
+                        <button
+                          key={zone.id}
+                          onClick={() => onFloorChange(floor.id, zone.id)}
+                          className={`w-full text-left px-3 py-2 rounded-lg transition-colors text-sm ${
+                            isActive
+                              ? `${zoneColorClass} ring-2 ring-blue-500 dark:ring-blue-400`
+                              : `bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-500 border-2 border-rose-500`
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="font-medium">{getDisplayName(zone.name)}</span>
+                            {isActive && (
+                              <span className="text-xs bg-blue-500 dark:bg-blue-600 text-white px-2 py-1 rounded-full">
+                                
+                              </span>
+                            )}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
-
-              {/* Lista de zonas */}
-              {expandedFloors[floor.id] && Array.isArray(floor.zones) && (
-                <div className="px-4 pb-3 space-y-2">
-                  {floor.zones.map((zone, zoneIndex) => {
-                    const isActive = currentFloor === floor.id && currentZone === zone.id;
-                    const zoneColorClass = getZoneColor(zoneIndex);
-                    
-                    return (
-                      <button
-                        key={zone.id}
-                        onClick={() => onFloorChange(floor.id, zone.id)}
-                        className={`w-full text-left px-3 py-2 rounded-lg transition-colors text-sm ${
-                          isActive
-                            ? `${zoneColorClass} ring-2 ring-blue-500 dark:ring-blue-400`
-                            : `bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-500 border-2 border-rose-500`
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="font-medium">{getDisplayName(zone.name)}</span>
-                          {isActive && (
-                            <span className="text-xs bg-blue-500 dark:bg-blue-600 text-white px-2 py-1 rounded-full">
-                              
-                            </span>
-                          )}
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-
-        {/* Botón para añadir nueva zona */}
-        <div className="mt-2 flex justify-end">
-          <button
-            onClick={handleAddZone}
-            className="w-full flex items-center justify-center px-4 py-2 mt-2 bg-teal-800 text-white rounded-lg hover:bg-teal-600 transition-colors"
-            title="Añadir nueva zona"
-          >
-            <BsPlusCircle className="w-5 h-5 mr-2" />
-            <span>Añadir Zona</span>
-          </button>
-        </div>
-
-        {/* Mensaje si no hay plantas */}
-        {floors.length === 0 && (
-          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-            <p className="text-sm">No hay plantas configuradas</p>
-            <p className="text-xs mt-1">Usa "Crear/Modificar Zonas" para empezar</p>
+            ))}
           </div>
-        )}
-      </div>
+
+          {/* Mensaje si no hay plantas */}
+          {floors.length === 0 && (
+            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+              <p className="text-sm">No hay plantas configuradas</p>
+              <p className="text-xs mt-1">Usa "Crear/Modificar Zonas" para empezar</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Botón para añadir nueva zona */}
+      <button
+        onClick={handleAddZone}
+        className={
+          collapsed
+            ? "w-full h-12 flex items-center justify-center bg-transparent text-teal-700 dark:text-teal-500 hover:bg-teal-800/10 dark:hover:bg-teal-500/10 transition-all"
+            : "w-full flex items-center justify-center px-4 py-2 bg-teal-800 text-white rounded-lg hover:bg-teal-600 transition-all"
+        }
+        title="Añadir nueva zona"
+      >
+        <BsPlusCircle className={`transition-all ${collapsed ? 'w-7 h-7' : 'w-5 h-5'}`} />
+        {!collapsed && <span className="ml-2">Añadir Zona</span>}
+      </button>
 
       {/* Botón de añadir dispositivo */}
-      <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+      <div className="flex justify-center">
         <button
           onClick={onAddDevice}
-          className="w-full px-4 py-3 bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-600 text-white rounded-lg flex items-center justify-center space-x-2 transition-colors"
-          disabled={!currentFloor || !currentZone}
+          className={
+            collapsed
+              ? "w-full h-12 flex items-center justify-center bg-transparent text-blue-700 dark:text-blue-400 hover:bg-blue-900/10 dark:hover:bg-blue-500/10 transition-all"
+              : "w-full px-4 py-3 flex items-center justify-center space-x-2 bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-600 text-white rounded-lg transition-all"
+          }
         >
-          <BsPlusCircle className="w-5 h-5" />
-          <span>Añadir Dispositivo</span>
+          <BsPlusCircle className={`transition-all ${collapsed ? 'w-7 h-7' : 'w-5 h-5'}`} />
+          {!collapsed && <span>Añadir Dispositivo</span>}
         </button>
-        
-        {(!currentFloor || !currentZone) && (
+        {(!currentFloor || !currentZone) && !collapsed && (
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">
             Selecciona una zona primero
           </p>

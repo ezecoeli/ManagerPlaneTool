@@ -168,6 +168,7 @@ function App() {
           roomObjects={currentRoomObjects}
           floorId={currentFloor}
           zoneId={currentZone}
+          floors={floors}
           onStartDrag={startDrag}
           onAddRoomObject={addRoomObject}
           onUpdateRoomObject={updateRoomObject} 

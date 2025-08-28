@@ -13,7 +13,8 @@ const Canvas = ({
   devices, 
   roomObjects,
   floorId, 
-  zoneId, 
+  zoneId,
+  floors, 
   onStartDrag, 
   onAddRoomObject,
   onUpdateRoomObject,
@@ -21,6 +22,11 @@ const Canvas = ({
   onUpdateDevice,
   dragState 
 }) => {
+  const floorObj = floors?.find(f => f.id === floorId);
+  const floorName = floorObj?.name || floorId;
+  const zoneObj = floorObj?.zones?.find(z => z.id === zoneId);
+  const zoneName = zoneObj?.name || zoneId;
+
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [showEditMenu, setShowEditMenu] = useState(false);
@@ -204,7 +210,7 @@ const Canvas = ({
       <div className="bg-gray-100 dark:bg-gray-800 px-4 py-3 flex items-center justify-between transition-colors duration-200">
         <div>
           <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
-            Plano - {floorId} / {zoneId}
+            Plano: {floorName} / {zoneName}
           </h2>
           <p className="text-sm text-gray-600 dark:text-gray-400">
             {devices.length} dispositivo{devices.length !== 1 ? 's' : ''} • {currentRoomObjects.length} objeto{currentRoomObjects.length !== 1 ? 's' : ''}

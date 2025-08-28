@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Sidebar from './Sidebar.jsx';
 import FloorManagementModal from './FloorManagementModal.jsx';
 import DataManagement from './DataManagement.jsx'; 
@@ -22,7 +22,22 @@ const MainLayout = ({
   deleteZone
 }) => {
   const [showFloorManagement, setShowFloorManagement] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const { theme, toggleTheme } = useTheme();
+
+  // Ocultar sidebar automáticamente en pantallas pequeñas
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setSidebarCollapsed(true);
+      } else {
+        setSidebarCollapsed(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    handleResize();
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   return (
     <div className="h-screen flex flex-col bg-gray-100 dark:bg-gray-900 transition-colors duration-200">
@@ -85,7 +100,7 @@ const MainLayout = ({
       </header>
       
       <div className="flex-1 flex overflow-hidden">
-        <div className="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-sm transition-colors duration-200">
+        <div className={`transition-all duration-300 ${sidebarCollapsed ? 'w-14 min-w-[3.5rem]' : 'w-64 min-w-[16rem]'}`}>
           <Sidebar
             currentFloor={currentFloor}
             currentZone={currentZone}
@@ -94,6 +109,8 @@ const MainLayout = ({
             addFloor={addFloor}
             addZone={addZone}
             floors={floors}
+            collapsed={sidebarCollapsed} 
+            onToggleCollapse={() => setSidebarCollapsed(v => !v)} 
           />
         </div>
         <main className="flex-1 overflow-hidden">
