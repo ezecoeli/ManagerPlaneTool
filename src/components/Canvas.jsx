@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect  } from 'react';
 import { createRoomObject,ROOM_OBJECT_TYPES } from '../data/roomTypes.js';
 import Device from './Device.jsx';
 import EditableObject from './EditableObject.jsx';
@@ -31,6 +31,9 @@ const Canvas = ({
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [showEditMenu, setShowEditMenu] = useState(false);
   const [showTextModal, setShowTextModal] = useState(false);
+  const [isPanning, setIsPanning] = useState(false);
+  const panStart = useRef({ x: 0, y: 0 });
+  const mouseStart = useRef({ x: 0, y: 0 });
   
   const [contextMenu, setContextMenu] = useState({ show: false, x: 0, y: 0, object: null });
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -57,6 +60,50 @@ const Canvas = ({
     setZoom(1);
     setPan({ x: 0, y: 0 });
   };
+
+  // Handler para iniciar pan (Shift+clic izquierdo o botón central)
+  const handlePanStart = (e) => {
+    // Solo si no estás arrastrando un objeto/dispositivo
+    if (e.button === 1 || (e.button === 0 && e.shiftKey)) {
+      setIsPanning(true);
+      panStart.current = { ...pan };
+      mouseStart.current = { x: e.clientX, y: e.clientY };
+      e.preventDefault();
+    }
+  };
+
+  // Handler para mover el pan
+  const handlePanMove = (e) => {
+    if (!isPanning) return;
+    const dx = e.clientX - mouseStart.current.x;
+    const dy = e.clientY - mouseStart.current.y;
+    setPan({
+      x: panStart.current.x + dx,
+      y: panStart.current.y + dy
+    });
+  };
+
+  // Handler para terminar el pan
+  const handlePanEnd = () => {
+    setIsPanning(false);
+  };
+
+  useEffect(() => {
+    if (isPanning) {
+      window.addEventListener('mousemove', handlePanMove);
+      window.addEventListener('mouseup', handlePanEnd);
+      document.body.style.cursor = 'grab';
+    } else {
+      window.removeEventListener('mousemove', handlePanMove);
+      window.removeEventListener('mouseup', handlePanEnd);
+      document.body.style.cursor = '';
+    }
+    return () => {
+      window.removeEventListener('mousemove', handlePanMove);
+      window.removeEventListener('mouseup', handlePanEnd);
+      document.body.style.cursor = '';
+    };
+  }, [isPanning]);
 
   const editOptions = [
     { id: 'wall-horizontal', icon: '━', label: 'Pared Horizontal' },
@@ -214,7 +261,7 @@ const Canvas = ({
           </h2>
           <p className="text-sm text-gray-600 dark:text-gray-400">
             {devices.length} dispositivo{devices.length !== 1 ? 's' : ''} • {currentRoomObjects.length} objeto{currentRoomObjects.length !== 1 ? 's' : ''}
-            {dragState?.isDragging && ' • 🎯 Arrastra para posicionar'}
+            
           </p>
         </div>
         
@@ -222,7 +269,7 @@ const Canvas = ({
           <div className="relative">
             <button
               onClick={() => setShowEditMenu(!showEditMenu)}
-              className="px-4 py-2 bg-purple-700 dark:bg-purple-900 text-white rounded-lg hover:bg-purple-700 dark:hover:bg-purple-600 flex items-center space-x-2 transition-colors duration-200"
+              className="px-4 py-2 bg-purple-700 dark:bg-purple-900 text-white rounded-lg hover:bg-purple-800 dark:hover:bg-purple-600 flex items-center space-x-2 transition-colors duration-200"
               disabled={dragState?.isDragging}
             >
               <BsPen className="w-4 h-4" />
@@ -312,8 +359,10 @@ const Canvas = ({
                 data-canvas-viewport
                 style={{
                   transform: `scale(${zoom}) translate(${pan.x}px, ${pan.y}px)`,
-                  transformOrigin: 'top left'
+                  transformOrigin: 'top left',
+                  cursor: isPanning ? 'grab' : 'default'
                 }}
+                onMouseDown={handlePanStart}
               >
                 {/* Grid Pattern */}
                 <div className="absolute inset-0 opacity-40 dark:opacity-30">
@@ -323,7 +372,7 @@ const Canvas = ({
                         <path 
                           d="M 20 0 L 0 0 0 20" 
                           fill="none" 
-                          stroke="#d1d5db" 
+                          stroke="#9ca3af"
                           className="dark:stroke-gray-500"
                           strokeWidth="0.5"
                         />
@@ -332,7 +381,7 @@ const Canvas = ({
                         <path 
                           d="M 100 0 L 0 0 0 100" 
                           fill="none" 
-                          stroke="#9ca3af"
+                          stroke="#6b7280"
                           className="dark:stroke-gray-400"
                           strokeWidth="1"
                         />
@@ -380,14 +429,31 @@ const Canvas = ({
                     />
                   </div>
                 ))}
+                
               </div>
             </div>
           </div>
 
+          {/* Ayuda visual para drag & drop */}
+          {dragState?.isDragging && (
+            <div className="flex justify-center absolute bottom-16 left-1/2 transform -translate-x-1/2 bg-blue-600 dark:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-lg transition-colors duration-200">
+              <span className="flex text-sm">
+                <GiPositionMarker className='w-5 h-5'/> Posicionamiento libre • "Esc" para cancelar
+              </span>
+            </div>
+          )}
+
+          {/* Ayuda visual para pan */}
+          {!isPanning && (
+            <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 text-s text-gray-200 bg-gray-900/80 px-3 py-1 rounded shadow whitespace-nowrap">
+              Mantén <b>Shift</b> y arrastra con click izquierdo, o usa el botón central del ratón, para mover el plano
+            </div>
+          )}
+
           {/* Zona de exclusión visual */}
           <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute top-0 left-0 right-0 h-6 bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 opacity-80 transition-colors duration-200"></div>
-            <div className="absolute bottom-0 left-0 right-0 h-6 bg-gray-100 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 opacity-80 transition-colors duration-200"></div>
+            <div className="absolute top-0 left-0 right-0 h-6 bg-gray-100 dark:bg-gray-800  border-gray-200 dark:border-gray-700 opacity-80 transition-colors duration-200"></div>
+            <div className="absolute bottom-0 left-0 right-0 h-6 bg-gray-100 dark:bg-gray-800  border-gray-200 dark:border-gray-700 opacity-80 transition-colors duration-200"></div>
             <div className="absolute top-6 bottom-6 left-0 w-6 bg-gray-100 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 opacity-80 transition-colors duration-200"></div>
             <div className="absolute top-6 bottom-6 right-0 w-6 bg-gray-100 dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 opacity-80 transition-colors duration-200"></div>
           </div>
@@ -412,14 +478,6 @@ const Canvas = ({
         )}
       </div>
 
-      {/* Drag indicators */}
-      {dragState?.isDragging && (
-        <div className="flex justify-center absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-blue-600 dark:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-lg transition-colors duration-200">
-          <span className="flex text-sm">
-            <GiPositionMarker className='w-5 h-5'/> Posicionamiento libre • "Esc" para cancelar
-          </span>
-        </div>
-      )}
 
       {/* Click fuera para cerrar el menú */}
       {showEditMenu && (

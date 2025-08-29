@@ -78,7 +78,7 @@ const Sidebar = ({
         )}
         <button
           onClick={onToggleCollapse}
-          className="rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+          className="flex items-center justify-center rounded-full h-8 w-8 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
           title={collapsed ? "Mostrar Sidebar" : "Ocultar Sidebar"}
         >
           {collapsed
@@ -100,14 +100,14 @@ const Sidebar = ({
 
       {/* Lista de plantas y zonas  si no está colapsado */}
       {!collapsed && (
-        <div className="flex-1 overflow-y-auto p-4">
+        <div className="flex-1 overflow-y-auto pt-2">
           <div className="space-y-2">
             {floors.map((floor) => (
               <div key={floor.id} className="border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-300 dark:bg-gray-500/50 transition-colors duration-200">
                 {/* Header zonas*/}
-                <div className="w-full px-4 py-3 flex items-center justify-between text-left rounded-lg transition-colors">
-                  <div className="flex items-center space-x-2">
-                    <h3 className="font-medium flex rounded-lg w-full px-3 py-2 bg-teal-800 dark:text-white">
+                <div className="w-full pl-2 pr-4 py-3 flex items-center justify-between text-left rounded-lg transition-colors">
+                  <div className="flex items-center space-x-4">
+                    <h3 className="font-medium flex rounded-lg w-full px-3 py-2 bg-[#478262] dark:text-white">
                       {getDisplayName(floor.name)}
                     </h3>
                     <button
@@ -133,7 +133,7 @@ const Sidebar = ({
 
                 {/* Lista de zonas */}
                 {expandedFloors[floor.id] && Array.isArray(floor.zones) && (
-                  <div className="px-4 pb-3 space-y-2">
+                  <div className="px-4 pb-3 ml-4 space-y-2">
                     {floor.zones.map((zone, zoneIndex) => {
                       const isActive = currentFloor === floor.id && currentZone === zone.id;
                       const zoneColorClass = getZoneColor(zoneIndex);
@@ -176,28 +176,33 @@ const Sidebar = ({
       )}
 
       {/* Botón para añadir nueva zona */}
-      <button
-        onClick={handleAddZone}
-        className={
-          collapsed
-            ? "w-full h-12 flex items-center justify-center bg-transparent text-teal-700 dark:text-teal-500 hover:bg-teal-800/10 dark:hover:bg-teal-500/10 transition-all"
-            : "w-full flex items-center justify-center px-4 py-2 bg-teal-800 text-white rounded-lg hover:bg-teal-600 transition-all"
-        }
-        title="Añadir nueva zona"
-      >
-        <BsPlusCircle className={`transition-all ${collapsed ? 'w-7 h-7' : 'w-5 h-5'}`} />
-        {!collapsed && <span className="ml-2">Añadir Zona</span>}
-      </button>
+      <div className="flex justify-center mb-2">
+        <button
+          onClick={handleAddZone}
+          className={
+            collapsed
+              ? "w-full h-12 flex items-center justify-center bg-transparent text-[#478262] dark:text-teal-500 hover:bg-teal-800/10 dark:hover:bg-teal-500/10 transition-all"
+              : "w-48 flex items-center justify-left px-4 py-2 space-x-5 bg-[#478262] text-white rounded-lg hover:bg-[#38684e] transition-all"
+          }
+          title="Añadir nueva zona"
+        >
+          <BsPlusCircle className={`transition-all ${collapsed ? 'w-7 h-7' : 'w-5 h-5'}`} />
+          {!collapsed && <span className="ml-2">Añadir Zona</span>}
+        </button>
+      </div>
+      {/* Espacio entre botones solo cuando no está colapsado */}
+      {!collapsed && <div className="my-2" />}
 
       {/* Botón de añadir dispositivo */}
-      <div className="flex justify-center">
+      <div className="flex justify-center mb-2">
         <button
           onClick={onAddDevice}
           className={
             collapsed
               ? "w-full h-12 flex items-center justify-center bg-transparent text-blue-700 dark:text-blue-400 hover:bg-blue-900/10 dark:hover:bg-blue-500/10 transition-all"
-              : "w-full px-4 py-3 flex items-center justify-center space-x-2 bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-600 text-white rounded-lg transition-all"
+              : "w-50 h-10 px-4 py-3 flex items-center justify-left space-x-3 bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-600 text-white rounded-lg transition-all"
           }
+          title="Añadir nuevo dispositivo"
         >
           <BsPlusCircle className={`transition-all ${collapsed ? 'w-7 h-7' : 'w-5 h-5'}`} />
           {!collapsed && <span>Añadir Dispositivo</span>}
