@@ -20,7 +20,8 @@ const Canvas = ({
   onUpdateRoomObject,
   onDeleteObject,
   onUpdateDevice,
-  dragState 
+  dragState,
+  onZoomPanChange
 }) => {
   const floorObj = floors?.find(f => f.id === floorId);
   const floorName = floorObj?.name || floorId;
@@ -103,7 +104,14 @@ const Canvas = ({
       window.removeEventListener('mouseup', handlePanEnd);
       document.body.style.cursor = '';
     };
+    
   }, [isPanning]);
+
+  useEffect(() => {
+    if (onZoomPanChange) {
+      onZoomPanChange({ zoom, pan });
+    }
+  }, [zoom, pan, onZoomPanChange]);
 
   const editOptions = [
     { id: 'wall-horizontal', icon: '━', label: 'Pared Horizontal' },

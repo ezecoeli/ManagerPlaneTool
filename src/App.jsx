@@ -22,6 +22,9 @@ function App() {
   const [showDeviceInfoModal, setShowDeviceInfoModal] = useState(false);
   const [selectedDeviceType, setSelectedDeviceType] = useState(null);
 
+  const [canvasZoom, setCanvasZoom] = useState(1);
+  const [canvasPan, setCanvasPan] = useState({ x: 0, y: 0 });
+
   useEffect(() => {
     if (floors.length > 0 && !currentFloor) {
       const firstFloor = floors[0];
@@ -70,13 +73,12 @@ function App() {
       if (dragState.isDragging) {
         endDrag((objectId, newPosition) => {
           const draggedObject = dragState.dragObject;
-          
           if (isDevice(draggedObject)) {
             updateDevicePosition(objectId, newPosition);
           } else if (isRoomObject(draggedObject)) {
             updateRoomObject(objectId, { position: newPosition });
           }
-        });
+        }, canvasZoom, canvasPan); 
       }
     };
 
@@ -175,6 +177,10 @@ function App() {
           onDeleteObject={handleDeleteObject}
           onUpdateDevice={handleUpdateDevice}
           dragState={dragState}
+          onZoomPanChange={({ zoom, pan }) => {
+            setCanvasZoom(zoom);
+            setCanvasPan(pan);
+          }}
         />
       </MainLayout>
 

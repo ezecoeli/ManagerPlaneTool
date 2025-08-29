@@ -61,30 +61,30 @@ export const useObjectMovement = () => {
     });
   }, []);
 
-  const endDrag = useCallback((onPositionUpdate) => {
+  const endDrag = useCallback((onPositionUpdate, zoom = 1, pan = { x: 0, y: 0 }) => {
     if (!dragState.isDragging || !dragState.dragObject) return;
 
     const workArea = document.querySelector('[data-work-area]');
-    
-    if (!workArea) {
-      return;
-    }
+    if (!workArea) return;
 
     const workAreaRect = workArea.getBoundingClientRect();
-    
-    const relativeX = dragState.currentPos.x - workAreaRect.left - dragState.offset.x;
-    const relativeY = dragState.currentPos.y - workAreaRect.top - dragState.offset.y;
+
+    // Convertir la posición del mouse a coordenadas del canvas real
+    const mouseCanvasX = (dragState.currentPos.x - workAreaRect.left - pan.x) / zoom;
+    const mouseCanvasY = (dragState.currentPos.y - workAreaRect.top - pan.y) / zoom;
 
     const objectWidth = dragState.dragObject.size?.width || 32;
     const objectHeight = dragState.dragObject.size?.height || 32;
 
+    // Límites en escala real
     const minX = 0;
     const minY = 0;
-    const maxX = workAreaRect.width - objectWidth;
-    const maxY = workAreaRect.height - objectHeight;
+    const maxX = (workAreaRect.width / zoom) - objectWidth;
+    const maxY = (workAreaRect.height / zoom) - objectHeight;
 
-    const finalX = Math.max(minX, Math.min(relativeX, maxX));
-    const finalY = Math.max(minY, Math.min(relativeY, maxY));
+    // posición limitada
+    const finalX = Math.max(minX, Math.min(mouseCanvasX, maxX));
+    const finalY = Math.max(minY, Math.min(mouseCanvasY, maxY));
 
     onPositionUpdate(dragState.dragObject.id, { x: finalX, y: finalY });
 
