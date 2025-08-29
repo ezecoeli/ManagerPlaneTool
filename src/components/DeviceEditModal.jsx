@@ -21,7 +21,7 @@ const DeviceEditModal = ({ device, onSave, onCancel }) => {
   const [errors, setErrors] = useState({});
   const [availableLocations, setAvailableLocations] = useState([]);
 
-  // ✅ Cargar datos del dispositivo al abrir
+  // Cargar datos del dispositivo al abrir
   useEffect(() => {
     if (device) {
       setDeviceData({
@@ -135,7 +135,7 @@ const DeviceEditModal = ({ device, onSave, onCancel }) => {
     e.preventDefault();
     
     if (validateForm()) {
-      // ✅ Mantener ID y posición originales
+      // Mantener ID y posición originales
       const updatedDevice = {
         ...device, // Mantener datos originales
         ...deviceData, // Aplicar cambios
@@ -194,7 +194,7 @@ const DeviceEditModal = ({ device, onSave, onCancel }) => {
             </button>
           </div>
 
-          {/* ✅ Formulario idéntico a DeviceInfoModal pero para edición */}
+          {/* Formulario  para edición */}
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Nombre del dispositivo */}
             <div>

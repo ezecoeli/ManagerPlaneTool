@@ -34,7 +34,7 @@ const Device = ({ device, zoom, onStartDrag, isBeingDragged = false }) => {
     return customProperties;
   };
 
-  const deviceSize = Math.max(24, 32 / zoom);
+  const deviceSize = Math.max(24, 38 / zoom);
   const tooltipScale = Math.max(0.8, 1 / zoom);
   const customProperties = getCustomProperties();
 
@@ -57,7 +57,7 @@ const Device = ({ device, zoom, onStartDrag, isBeingDragged = false }) => {
     >
 
       <div
-        className="flex items-center justify-center rounded-lg shadow-lg bg-white transition-all duration-200"
+        className="flex items-center justify-center transition-all duration-200"
         style={{
           width: deviceSize,
           height: deviceSize,
@@ -66,7 +66,7 @@ const Device = ({ device, zoom, onStartDrag, isBeingDragged = false }) => {
         
         {IconComponent ? (
           <IconComponent 
-            className="transition-all duration-200 text-gray-700" 
+            className="transition-all duration-200 text-black dark:text-white" 
             style={{
               width: deviceSize * 0.6,
               height: deviceSize * 0.6,
@@ -84,7 +84,7 @@ const Device = ({ device, zoom, onStartDrag, isBeingDragged = false }) => {
 
       {/* Status Indicator */}
       <div
-        className="absolute -top-1 -right-1 rounded-full border-2 border-white"
+        className="absolute -top-1 rounded-full "
         style={{
           backgroundColor: deviceStatus?.color || '#22c55e',
           width: deviceSize * 0.25,
@@ -130,7 +130,7 @@ const Device = ({ device, zoom, onStartDrag, isBeingDragged = false }) => {
               ))}
               {customProperties.length > 3 && (
                 <div className="text-xs text-gray-500 italic">
-                  +{customProperties.length - 3} más...
+                  +{customProperties.length - 3} 
                 </div>
               )}
             </div>

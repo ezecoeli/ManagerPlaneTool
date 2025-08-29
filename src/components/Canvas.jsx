@@ -5,9 +5,10 @@ import EditableObject from './EditableObject.jsx';
 import TextModal from './TextModal.jsx';
 import ContextMenu from './ContextMenu.jsx';
 import ConfirmDeleteModal from './ConfirmDeleteModal.jsx';
-import { BsPen, BsDoorOpen, BsTextLeft, BsZoomIn, BsZoomOut } from "react-icons/bs";
+import { BsChevronDown, BsPen, BsDoorOpen, BsTextLeft, BsZoomIn, BsZoomOut, BsPlusSquare, BsLayoutWtf } from "react-icons/bs";
 import { GiCrane, GiPositionMarker } from "react-icons/gi";
 import DeviceEditModal from './DeviceEditModal.jsx';
+import KonvaCanvas from './KonvaCanvas.jsx';
 
 const Canvas = ({ 
   devices, 
@@ -48,6 +49,9 @@ const Canvas = ({
   const [showEditDeviceModal, setShowEditDeviceModal] = useState(false);
 
   const currentRoomObjects = roomObjects;
+
+  const [drawMenuOpen, setDrawMenuOpen] = useState(false);
+  const [drawMode, setDrawMode] = useState(null); 
 
   const handleZoomIn = () => {
     setZoom(prev => Math.min(prev * 1.2, 3));
@@ -114,13 +118,8 @@ const Canvas = ({
   }, [zoom, pan, onZoomPanChange]);
 
   const editOptions = [
-    { id: 'wall-horizontal', icon: '━', label: 'Pared Horizontal' },
-    { id: 'wall-vertical', icon: '┃', label: 'Pared Vertical' },
-    { id: 'wall-diagonal', icon: '╱', label: 'Pared Diagonal' },
-    { id: 'wall-diagonal-reverse', icon: '╲', label: 'Pared Diagonal' },
-    { id: 'rectangle', icon: '▢', label: 'Rectángulo' },
     { id: 'door', icon: BsDoorOpen, label: 'Puerta', isReactIcon: true },
-    { id: 'text', icon: BsTextLeft , label: 'Texto', isReactIcon: true }
+    { id: 'text', icon: BsTextLeft , label: 'Etiqueta de Texto', isReactIcon: true }
   ];
 
   const handleEditOption = (optionId) => {
@@ -259,6 +258,11 @@ const Canvas = ({
     setShowDeleteModal(false);
   };
 
+  const [drawingLine, setDrawingLine] = useState(false);
+  const [lineStart, setLineStart] = useState(null);
+  const [linePreview, setLinePreview] = useState(null);
+  const [drawingRectangle, setDrawingRectangle] = useState(false);
+
   return (
     <div className="h-full flex flex-col bg-gray-50 dark:bg-gray-900 transition-colors duration-200" data-canvas-container>
       {/* Canvas Header */}
@@ -274,16 +278,76 @@ const Canvas = ({
         </div>
         
         <div className="flex items-center space-x-4">
+          {/* Botónes de dibujo */}
+          <div className="relative">
+          <button
+            onClick={() => setDrawMenuOpen(v => !v)}
+            className={`px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors duration-200
+              ${drawMode
+                ? 'bg-amber-600 text-white hover:bg-amber-700'
+                : 'bg-amber-600 text-white hover:bg-amber-700'
+              }`}
+            title="Dibujar"
+            style={{ marginRight: '8px' }}
+            disabled={dragState?.isDragging}
+          >
+            <span className="text-lg">
+              {drawMode === 'rect' ? '▭' : drawMode === 'line' ? '/' : <BsPen />}
+            </span>
+            <span>
+              Dibujar
+            </span>
+            <span className={`transform transition-transform ${drawMenuOpen ? 'rotate-180' : ''}`}>
+              <BsChevronDown className="ml-2" />
+            </span>
+          </button>
+          {drawMenuOpen && (
+            <>
+              <div
+                className="fixed inset-0 z-10"
+                onClick={() => setDrawMenuOpen(false)}
+                style={{ background: 'transparent' }}
+              />
+              <div className="absolute left-0 mt-2 w-40 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-20">
+                <button
+                  onClick={() => {
+                    setDrawMode('line');
+                    setDrawingLine(true);
+                    setDrawingRectangle(false);
+                    setDrawMenuOpen(false);
+                  }}
+                  className="w-full text-left px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center space-x-2"
+                >
+                  <span className="text-lg text-black dark:text-white">/</span>
+                  <span className="text-lg text-black dark:text-white">Línea</span>
+                </button>
+                <button
+                  onClick={() => {
+                    setDrawMode('rect');
+                    setDrawingRectangle(true);
+                    setDrawingLine(false);
+                    setDrawMenuOpen(false);
+                  }}
+                  className="w-full text-left px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center space-x-2"
+                >
+                  <span className="text-lg text-black dark:text-white">▭</span>
+                  <span className="text-lg text-black dark:text-white">Rectángulo</span>
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+          {/* Menú de añadir objetos */}
           <div className="relative">
             <button
               onClick={() => setShowEditMenu(!showEditMenu)}
-              className="px-4 py-2 bg-purple-700 dark:bg-purple-900 text-white rounded-lg hover:bg-purple-800 dark:hover:bg-purple-600 flex items-center space-x-2 transition-colors duration-200"
+              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center space-x-2 transition-colors duration-200"
               disabled={dragState?.isDragging}
             >
-              <BsPen className="w-4 h-4" />
-              <span>Editar área de trabajo</span>
+              <BsLayoutWtf className="w-4 h-4" />
+              <span>Objetos</span>
               <span className={`transform transition-transform ${showEditMenu ? 'rotate-180' : ''}`}>
-                ▼
+                <BsChevronDown className="ml-2" />
               </span>
             </button>
 
@@ -296,7 +360,7 @@ const Canvas = ({
                     <button
                       key={option.id}
                       onClick={() => handleEditOption(option.id)}
-                      className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-3 text-gray-700 dark:text-gray-200 transition-colors duration-200"
+                      className="w-full text-left px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center space-x-3 text-gray-700 dark:text-gray-200 transition-colors duration-200"
                     >
                       <div className="text-lg min-w-[24px] flex items-center justify-center">
                         {IconComponent ? (
@@ -368,10 +432,32 @@ const Canvas = ({
                 style={{
                   transform: `scale(${zoom}) translate(${pan.x}px, ${pan.y}px)`,
                   transformOrigin: 'top left',
-                  cursor: isPanning ? 'grab' : 'default'
+                  cursor: isPanning 
+                    ? 'grab' 
+                    : drawingLine
+                      ? 'crosshair'
+                      : drawingRectangle
+                        ? 'cell'
+                        : 'default'
                 }}
                 onMouseDown={handlePanStart}
               >
+
+                <KonvaCanvas
+                  objects={currentRoomObjects}
+                  drawingLine={drawingLine}
+                  setDrawingLine={setDrawingLine}
+                  drawingRectangle={drawingRectangle}
+                  setDrawingRectangle={setDrawingRectangle}
+                  lineStart={lineStart}
+                  setLineStart={setLineStart}
+                  linePreview={linePreview}
+                  setLinePreview={setLinePreview}
+                  onAddRoomObject={onAddRoomObject}
+                  floorId={floorId}
+                  zoneId={zoneId}
+                />
+
                 {/* Grid Pattern */}
                 <div className="absolute inset-0 opacity-40 dark:opacity-30">
                   <svg width="100%" height="100%">
@@ -408,19 +494,21 @@ const Canvas = ({
                 </div>
 
                 {/* Room Objects con menú contextual */}
-                {currentRoomObjects.map(roomObject => (
-                  <div
-                    key={roomObject.id}
-                    onContextMenu={(e) => handleContextMenu(e, roomObject)}
-                  >
-                    <EditableObject
-                      object={roomObject}
-                      zoom={zoom}
-                      onStartDrag={onStartDrag}
-                      onUpdate={handleRoomObjectUpdate}
-                      isBeingDragged={dragState?.dragObject?.id === roomObject.id}
-                    />
-                  </div>
+                {currentRoomObjects
+                  .filter(obj => obj.type === 'door' || obj.type === 'text')
+                  .map(roomObject => (
+                    <div
+                      key={roomObject.id}
+                      onContextMenu={(e) => handleContextMenu(e, roomObject)}
+                    >
+                      <EditableObject
+                        object={roomObject}
+                        zoom={zoom}
+                        onStartDrag={onStartDrag}
+                        onUpdate={handleRoomObjectUpdate}
+                        isBeingDragged={dragState?.dragObject?.id === roomObject.id}
+                      />
+                    </div>
                 ))}
 
                 {/* Devices con menú contextual */}
@@ -453,7 +541,7 @@ const Canvas = ({
 
           {/* Ayuda visual para pan */}
           {!isPanning && (
-            <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 text-s text-gray-200 bg-gray-900/80 px-3 py-1 rounded shadow whitespace-nowrap">
+            <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 text-s text-gray-200 bg-gray-900/80 px-3 py-0 rounded shadow whitespace-nowrap">
               Mantén <b>Shift</b> y arrastra con click izquierdo, o usa el botón central del ratón, para mover el plano
             </div>
           )}

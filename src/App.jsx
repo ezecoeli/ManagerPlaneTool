@@ -6,6 +6,7 @@ import Canvas from './components/Canvas.jsx';
 import DeviceTypeSelector from './components/DeviceTypeSelector.jsx';
 import DeviceInfoModal from './components/DeviceInfoModal.jsx';
 
+
 import { FiMove } from 'react-icons/fi';
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
 
   const [canvasZoom, setCanvasZoom] = useState(1);
   const [canvasPan, setCanvasPan] = useState({ x: 0, y: 0 });
+
 
   useEffect(() => {
     if (floors.length > 0 && !currentFloor) {
@@ -182,6 +184,7 @@ function App() {
             setCanvasPan(pan);
           }}
         />
+        
       </MainLayout>
 
       {dragState.isDragging && (

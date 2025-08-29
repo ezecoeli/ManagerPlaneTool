@@ -1,34 +1,4 @@
 export const ROOM_OBJECT_TYPES = {
-  'wall-horizontal': {
-    name: 'Pared Horizontal',
-    icon: '━',
-    editable: false,
-    defaultSize: { width: 120, height: 8 }
-  },
-  'wall-vertical': {
-    name: 'Pared Vertical',
-    icon: '┃',
-    editable: false,
-    defaultSize: { width: 8, height: 120 }
-  },
-  'wall-diagonal': {
-    name: 'Pared Diagonal',
-    icon: '╱',
-    editable: false,
-    defaultSize: { width: 80, height: 80 }
-  },
-  'wall-diagonal-reverse': {
-    name: 'Pared Diagonal',
-    icon: '╲',
-    editable: false,
-    defaultSize: { width: 80, height: 80 } 
-  },
-  'rectangle': {
-    name: 'Rectángulo',
-    icon: '▢',
-    editable: false,
-    defaultSize: { width: 300, height: 250 },
-  },
   'door': {
     name: 'Puerta',
     icon: '🚪',
