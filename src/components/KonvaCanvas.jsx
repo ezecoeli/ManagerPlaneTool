@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState } from 'react';
 import { Stage, Layer, Rect, Line } from 'react-konva';
 import { useTheme } from '../hooks/useTheme';
+import ConfirmDeleteModal from "./ConfirmDeleteModal";
 
 const KonvaCanvas = ({
     objects = [],
@@ -13,8 +14,10 @@ const KonvaCanvas = ({
     linePreview,
     setLinePreview,
     onAddRoomObject,
+    onDeleteRoomObject,
     floorId,
-    zoneId
+    zoneId,
+    onContextMenuObject,
 }) => {
     const { theme } = useTheme();
     const isDark = theme === 'dark';
@@ -36,6 +39,21 @@ const KonvaCanvas = ({
             window.removeEventListener('keyup', handleKeyUp);
         };
     }, []);
+
+    {/* Modal de confirmación para eliminar dibujos */}
+    const [shapeToDelete, setShapeToDelete] = useState(null);
+
+    const handleShapeContextMenu = (e, obj) => {
+        e.evt.preventDefault();
+        if (onContextMenuObject) {
+            // Usa la posición del mouse del evento Konva
+            onContextMenuObject({
+                object: obj,
+                x: e.evt.clientX,
+                y: e.evt.clientY
+            });
+        }
+    };
 
     const containerRef = useRef(null);
     const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
@@ -161,7 +179,7 @@ const KonvaCanvas = ({
                 height: '100%',
                 zIndex: 10,
                 background: "transparent",
-                pointerEvents: drawingLine || drawingRectangle ? 'auto' : 'none'
+                pointerEvents: 'auto'
             }}
         >
 
@@ -174,6 +192,7 @@ const KonvaCanvas = ({
                 onMouseDown={handleStageMouseDown}
                 onMouseMove={handleStageMouseMove}
                 onMouseUp={handleStageMouseUp}
+                onContextMenu={e => e.evt.preventDefault()}
             >
                 <Layer>
                     {objects.map(obj => {
@@ -188,20 +207,48 @@ const KonvaCanvas = ({
                                     stroke={isDark ? '#fff' : '#fff'}
                                     strokeWidth={4}
                                     lineCap="round"
+                                    onMouseDown={e => {
+                                        if (e.evt.button === 2) {
+                                          e.evt.preventDefault();
+                                          handleShapeContextMenu(e, obj);
+                                        }
+                                    }}
+                                    onMouseEnter={e => {
+                                        const stage = e.target.getStage();
+                                        stage.container().style.cursor = 'pointer';
+                                    }}
+                                    onMouseLeave={e => {
+                                        const stage = e.target.getStage();
+                                        stage.container().style.cursor = 'default';
+                                    }}
                                 />
                             );
                         }
                         if (obj.type === 'rect') {
                             return (
                                 <Rect
-                                    key={obj.id}
-                                    x={obj.position.x}
-                                    y={obj.position.y}
-                                    width={obj.size.width}
-                                    height={obj.size.height}
-                                    fill={obj.properties?.backgroundColor || 'transparent'}
-                                    stroke={isDark ? '#fff' : (obj.properties?.color || '#fff')}
-                                    strokeWidth={4}
+                                  key={obj.id}
+                                  x={obj.position.x}
+                                  y={obj.position.y}
+                                  width={obj.size.width}
+                                  height={obj.size.height}
+                                  fill={obj.properties?.backgroundColor || 'transparent'}
+                                  stroke={isDark ? '#fff' : (obj.properties?.color || '#fff')}
+                                  strokeWidth={4}
+                                  onMouseDown={e => {
+                                    if (e.evt.button === 2) {
+                                      e.evt.preventDefault();
+                                      handleShapeContextMenu(e, obj);
+                                    }
+                                  }}
+                                    onMouseEnter={e => {
+                                        const stage = e.target.getStage();
+                                        stage.container().style.cursor = 'pointer';
+                                    }}
+                                    onMouseLeave={e => {
+                                        const stage = e.target.getStage();
+                                        stage.container().style.cursor = 'default';
+                                    }}
                                 />
                             );
                         }
@@ -234,7 +281,9 @@ const KonvaCanvas = ({
                     )}
                 </Layer>
             </Stage>
+
         </div>
+        
     );
 };
 

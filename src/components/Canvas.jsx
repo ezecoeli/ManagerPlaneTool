@@ -5,7 +5,7 @@ import EditableObject from './EditableObject.jsx';
 import TextModal from './TextModal.jsx';
 import ContextMenu from './ContextMenu.jsx';
 import ConfirmDeleteModal from './ConfirmDeleteModal.jsx';
-import { BsChevronDown, BsPen, BsDoorOpen, BsTextLeft, BsZoomIn, BsZoomOut, BsPlusSquare, BsLayoutWtf } from "react-icons/bs";
+import { BsChevronDown, BsPen, BsDoorOpen, BsTextLeft, BsZoomIn, BsZoomOut, BsLayoutWtf } from "react-icons/bs";
 import { GiCrane, GiPositionMarker } from "react-icons/gi";
 import DeviceEditModal from './DeviceEditModal.jsx';
 import KonvaCanvas from './KonvaCanvas.jsx';
@@ -258,6 +258,21 @@ const Canvas = ({
     setShowDeleteModal(false);
   };
 
+  const handleShapeContextMenu = ({ object, x, y }) => {
+  // prevenir el menu contextual del navegador al hacer click derecho
+    window.addEventListener('contextmenu', preventDefaultOnce, { capture: true, once: true });
+    setContextMenu({
+      show: true,
+      x,
+      y,
+      object
+    });
+  };
+
+  function preventDefaultOnce(e) {
+    e.preventDefault();
+  }
+
   const [drawingLine, setDrawingLine] = useState(false);
   const [lineStart, setLineStart] = useState(null);
   const [linePreview, setLinePreview] = useState(null);
@@ -451,6 +466,7 @@ const Canvas = ({
                 onAddRoomObject={onAddRoomObject}
                 floorId={floorId}
                 zoneId={zoneId}
+                onContextMenuObject={handleShapeContextMenu}
               />
 
                 {/* Grid Pattern */}

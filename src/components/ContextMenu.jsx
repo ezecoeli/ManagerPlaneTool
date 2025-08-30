@@ -1,5 +1,6 @@
 import { BsPencil, BsTrash } from "react-icons/bs";
 import { ROOM_OBJECT_TYPES } from '../data/roomTypes.js';
+import { DEVICE_TYPES } from '../data/devicesTypes.js';
 
 const ContextMenu = ({ x, y, object, onEdit, onDelete, onClose }) => {
   if (!object) return null;
@@ -19,6 +20,8 @@ const ContextMenu = ({ x, y, object, onEdit, onDelete, onClose }) => {
                    (object.hasOwnProperty('type') && !ROOM_OBJECT_TYPES[object.type]);
   
   const objectType = ROOM_OBJECT_TYPES[object.type];
+
+  const typeConfig = DEVICE_TYPES[object.type];
   
   const isEditable = () => {
     if (isDevice) {
@@ -39,7 +42,7 @@ const ContextMenu = ({ x, y, object, onEdit, onDelete, onClose }) => {
       return {
         type: 'Dispositivo',
         name: object.name || 'Sin nombre',
-        subtitle: object.type || 'Tipo desconocido'
+        subtitle: typeConfig ? typeConfig.name : (object.type || 'Tipo desconocido')
       };
     } else {
       return {
@@ -52,6 +55,9 @@ const ContextMenu = ({ x, y, object, onEdit, onDelete, onClose }) => {
 
   const displayInfo = getObjectDisplayInfo();
 
+  // Verificar si el objeto es una línea o un rectángulo
+  const isShape = object?.type === 'line' || object?.type === 'rect';
+
   return (
     <div className="fixed inset-0 z-50" onClick={onClose}>
       <div
@@ -62,6 +68,7 @@ const ContextMenu = ({ x, y, object, onEdit, onDelete, onClose }) => {
           transform: 'translate(-50%, -100%)'
         }}
         onClick={(e) => e.stopPropagation()}
+        onContextMenu={e => e.preventDefault()}
       >
         {/* Header del menú contextual */}
         <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
@@ -81,8 +88,8 @@ const ContextMenu = ({ x, y, object, onEdit, onDelete, onClose }) => {
 
         {/* Opciones del menú */}
         <div className="py-1">
-          {/* Mostrar botón editar si es editable */}
-          {isEditable() && (
+          {/* Mostrar botón editar solo si es editable*/}
+          {!isShape && isEditable() && (
             <button
               onClick={() => handleAction('edit')}
               className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center space-x-2"

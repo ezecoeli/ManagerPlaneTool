@@ -8,7 +8,7 @@ export const DEVICE_TYPES = {
   },
   laptop: {
     icon: BsLaptop,
-    name: "Notebook"
+    name: "Laptop"
   },
   network: {
     icon: BsEthernet,
