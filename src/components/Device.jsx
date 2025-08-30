@@ -66,7 +66,7 @@ const Device = ({ device, zoom, onStartDrag, isBeingDragged = false }) => {
         
         {IconComponent ? (
           <IconComponent 
-            className="transition-all duration-200 text-black dark:text-white" 
+            className="transition-all duration-200 text-gray-100" 
             style={{
               width: deviceSize * 0.6,
               height: deviceSize * 0.6,
@@ -84,11 +84,12 @@ const Device = ({ device, zoom, onStartDrag, isBeingDragged = false }) => {
 
       {/* Status Indicator */}
       <div
-        className="absolute -top-1 rounded-full "
+        className="absolute -top-1 rounded-full ring-1 ring-gray-400"
         style={{
           backgroundColor: deviceStatus?.color || '#22c55e',
           width: deviceSize * 0.25,
-          height: deviceSize * 0.25
+          height: deviceSize * 0.25,
+          animation: device.status === 'active' ? 'pulse-status 1.5s infinite' : undefined
         }}
         title={deviceStatus?.name || 'Activo'}
       />

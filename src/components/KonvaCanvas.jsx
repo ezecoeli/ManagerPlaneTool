@@ -107,7 +107,7 @@ const KonvaCanvas = ({
                     floor: floorId,
                     zone: zoneId,
                     properties: {
-                        color: '#374151',
+                        color: '#fff',
                         borderWidth: 2,
                         backgroundColor: 'transparent'
                     }
@@ -131,8 +131,8 @@ const KonvaCanvas = ({
                 inset: 0,
                 width: '100%',
                 height: '100%',
-                background: '#0c859650',
                 zIndex: 1000,
+                background: "transparent",
                 pointerEvents: drawingLine || drawingRectangle ? 'auto' : 'none'
             }}
         >
@@ -157,7 +157,7 @@ const KonvaCanvas = ({
                                         obj.points[0].x, obj.points[0].y,
                                         obj.points[1].x, obj.points[1].y
                                     ]}
-                                    stroke={isDark ? '#fff' : '#374151'}
+                                    stroke={isDark ? '#fff' : '#fff'}
                                     strokeWidth={4}
                                     lineCap="round"
                                 />
@@ -172,7 +172,7 @@ const KonvaCanvas = ({
                                     width={obj.size.width}
                                     height={obj.size.height}
                                     fill={obj.properties?.backgroundColor || 'transparent'}
-                                    stroke={isDark ? '#fff' : (obj.properties?.color || '#374151')}
+                                    stroke={isDark ? '#fff' : (obj.properties?.color || '#fff')}
                                     strokeWidth={4}
                                 />
                             );
@@ -186,7 +186,7 @@ const KonvaCanvas = ({
                                 lineStart.x, lineStart.y,
                                 linePreview.x, linePreview.y
                             ]}
-                            stroke="#2563eb"
+                            stroke="#e0e7ef"
                             strokeWidth={3}
                             dash={[10, 5]}
                         />
@@ -199,7 +199,7 @@ const KonvaCanvas = ({
                             width={Math.abs(linePreview.x - lineStart.x)}
                             height={Math.abs(linePreview.y - lineStart.y)}
                             fill="rgba(37,99,235,0.1)"
-                            stroke="#2563eb"
+                            stroke="#e0e7ef"
                             strokeWidth={2}
                             dash={[8, 4]}
                         />

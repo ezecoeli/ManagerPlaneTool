@@ -107,7 +107,7 @@ const Sidebar = ({
                 {/* Header zonas*/}
                 <div className="w-full pl-2 pr-4 py-3 flex items-center justify-between text-left rounded-lg transition-colors">
                   <div className="flex items-center space-x-4">
-                    <h3 className="font-medium flex rounded-lg w-full px-3 py-2 bg-[#478262] dark:text-white">
+                    <h3 className="font-medium flex rounded-lg w-full px-3 py-2 bg-[#007b8b] dark:text-white">
                       {getDisplayName(floor.name)}
                     </h3>
                     <button
@@ -182,7 +182,7 @@ const Sidebar = ({
           className={
             collapsed
               ? "w-full h-12 flex items-center justify-center bg-transparent text-[#478262] dark:text-teal-500 hover:bg-teal-800/10 dark:hover:bg-teal-500/10 transition-all"
-              : "w-48 flex items-center justify-left px-4 py-2 space-x-5 bg-[#478262] text-white rounded-lg hover:bg-[#38684e] transition-all"
+              : "w-48 flex items-center justify-left px-4 py-2 space-x-5 bg-[#007b8b] text-white rounded-lg hover:bg-[#38684e] transition-all"
           }
           title="Añadir nueva zona"
         >

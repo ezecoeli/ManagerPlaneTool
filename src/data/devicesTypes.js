@@ -25,8 +25,8 @@ export const DEVICE_TYPES = {
 };
 
 export const DEVICE_STATUS = {
-  active: { color: "#10b981", name: "Activo" },
-  inactive: { color: "#6b7280", name: "Inactivo" },
-  maintenance: { color: "#f59e0b", name: "Mantenimiento" },
+  active: { color: "#22c55e", name: "Activo" },
+  inactive: { color: "#000", name: "Inactivo" },
+  maintenance: { color: "#fbbf24", name: "Mantenimiento" },
   error: { color: "#ef4444", name: "Error" }
 };

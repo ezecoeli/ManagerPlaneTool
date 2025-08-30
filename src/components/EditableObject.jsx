@@ -24,21 +24,8 @@ const EditableObject = ({ object, zoom, onStartDrag, onUpdate, isBeingDragged = 
     setShowTooltip(false);
   };
 
-  const handleObjectChange = (changes) => {
-    if (onUpdate) {
-      onUpdate(object.id, changes);
-    }
-  };
-
   const getZIndex = (objectType) => {
     switch(objectType) {
-      case 'rectangle': 
-        return 0;
-      case 'wall-horizontal':
-      case 'wall-vertical': 
-      case 'wall-diagonal':
-      case 'wall-diagonal-reverse':
-        return 10;
       case 'door': 
         return 50;
       case 'text': 
@@ -61,7 +48,7 @@ const EditableObject = ({ object, zoom, onStartDrag, onUpdate, isBeingDragged = 
 
       case 'door':
         return (
-          <div className="w-full h-full flex items-center justify-center text-black dark:text-white">
+          <div className="w-full h-full flex items-center justify-center text-white">
             <BsDoorOpen size={36} />
           </div>
         );

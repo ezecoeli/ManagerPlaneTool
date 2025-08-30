@@ -425,7 +425,11 @@ const Canvas = ({
         <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 transition-colors duration-200">
           
           <div className="absolute inset-6" data-canvas-wrapper>
-            <div className="w-full h-full bg-white dark:bg-gray-700 rounded-lg shadow-inner border-2 border-gray-300 dark:border-gray-600 transition-colors duration-200" data-canvas-background>
+            <div 
+              className="w-full h-full rounded-lg border-2 border-gray-500 dark:border-gray-400 transition-colors duration-200"
+              data-canvas-background
+              style={{ background: "#007b8b"}}
+            >
               <div 
                 className="relative w-full h-full overflow-hidden rounded-lg"
                 data-canvas-viewport
@@ -443,20 +447,20 @@ const Canvas = ({
                 onMouseDown={handlePanStart}
               >
 
-                <KonvaCanvas
-                  objects={currentRoomObjects}
-                  drawingLine={drawingLine}
-                  setDrawingLine={setDrawingLine}
-                  drawingRectangle={drawingRectangle}
-                  setDrawingRectangle={setDrawingRectangle}
-                  lineStart={lineStart}
-                  setLineStart={setLineStart}
-                  linePreview={linePreview}
-                  setLinePreview={setLinePreview}
-                  onAddRoomObject={onAddRoomObject}
-                  floorId={floorId}
-                  zoneId={zoneId}
-                />
+              <KonvaCanvas
+                objects={currentRoomObjects}
+                drawingLine={drawingLine}
+                setDrawingLine={setDrawingLine}
+                drawingRectangle={drawingRectangle}
+                setDrawingRectangle={setDrawingRectangle}
+                lineStart={lineStart}
+                setLineStart={setLineStart}
+                linePreview={linePreview}
+                setLinePreview={setLinePreview}
+                onAddRoomObject={onAddRoomObject}
+                floorId={floorId}
+                zoneId={zoneId}
+              />
 
                 {/* Grid Pattern */}
                 <div className="absolute inset-0 opacity-40 dark:opacity-30">
@@ -466,8 +470,8 @@ const Canvas = ({
                         <path 
                           d="M 20 0 L 0 0 0 20" 
                           fill="none" 
-                          stroke="#9ca3af"
-                          className="dark:stroke-gray-500"
+                          stroke="#e0e7ef"
+                          className="dark:stroke-white-500"
                           strokeWidth="0.5"
                         />
                       </pattern>
@@ -475,8 +479,8 @@ const Canvas = ({
                         <path 
                           d="M 100 0 L 0 0 0 100" 
                           fill="none" 
-                          stroke="#6b7280"
-                          className="dark:stroke-gray-400"
+                          stroke="#fff"
+                          className="dark:stroke-white"
                           strokeWidth="1"
                         />
                       </pattern>
@@ -487,8 +491,8 @@ const Canvas = ({
                 </div>
 
                 {/* Área de trabajo con identificador específico */}
-                <div className="absolute inset-4 border-2 border-dashed border-gray-300 dark:border-gray-500 rounded-lg transition-colors duration-200" data-work-area>
-                  <div className="absolute top-2 left-2 text-xs text-gray-400 dark:text-gray-400 font-medium">
+                <div className="absolute inset-1 border-2 border-dashed border-gray-300 dark:border-gray-400 rounded-lg transition-colors duration-200" data-work-area>
+                  <div className="absolute top-2 left-2 text-xs text-gray-300 dark:text-gray-300 font-medium">
                     Área de trabajo
                   </div>
                 </div>
@@ -558,15 +562,15 @@ const Canvas = ({
         {/* Estado vacío */}
         {devices.length === 0 && currentRoomObjects.length === 0 && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="text-center text-gray-500 dark:text-gray-400">
+            <div className="text-center text-gray-200">
               <div className="flex justify-center mb-4">
-                <GiCrane className="w-8 h-8 text-gray-400 dark:text-gray-500" />
+                <GiCrane className="w-8 h-8" />
               </div>
-              <h3 className="text-lg font-medium mb-2 text-gray-600 dark:text-gray-300">Plano vacío</h3>
+              <h3 className="text-lg font-medium mb-2">Plano vacío</h3>
               <p className="text-sm">
                 Utiliza "+" para añadir dispositivos o <BsPen className="inline w-4 h-4 mx-1" /> para construir planos
               </p>
-              <p className="text-xs mt-2 text-gray-400 dark:text-gray-400">
+              <p className="text-xs mt-2">
                 Arrastra elementos para posicionarlos • Click derecho para eliminar
               </p>
             </div>

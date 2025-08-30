@@ -64,29 +64,36 @@ export const useObjectMovement = () => {
   const endDrag = useCallback((onPositionUpdate, zoom = 1, pan = { x: 0, y: 0 }) => {
     if (!dragState.isDragging || !dragState.dragObject) return;
 
-    const workArea = document.querySelector('[data-work-area]');
-    if (!workArea) return;
+    const dx = dragState.currentPos.x - dragState.startPos.x;
+    const dy = dragState.currentPos.y - dragState.startPos.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
 
-    const workAreaRect = workArea.getBoundingClientRect();
+    // actualiza si el usuario realmente arrastró (más de 3px)
+    if (distance > 3) {
+      const workArea = document.querySelector('[data-work-area]');
+      if (!workArea) return;
 
-    // Convertir la posición del mouse a coordenadas del canvas real
-    const mouseCanvasX = (dragState.currentPos.x - workAreaRect.left - pan.x) / zoom;
-    const mouseCanvasY = (dragState.currentPos.y - workAreaRect.top - pan.y) / zoom;
+      const workAreaRect = workArea.getBoundingClientRect();
 
-    const objectWidth = dragState.dragObject.size?.width || 32;
-    const objectHeight = dragState.dragObject.size?.height || 32;
+      // Convertir la posición del mouse a coordenadas del canvas real
+      const mouseCanvasX = (dragState.currentPos.x - workAreaRect.left - pan.x) / zoom;
+      const mouseCanvasY = (dragState.currentPos.y - workAreaRect.top - pan.y) / zoom;
 
-    // Límites en escala real
-    const minX = 0;
-    const minY = 0;
-    const maxX = (workAreaRect.width / zoom) - objectWidth;
-    const maxY = (workAreaRect.height / zoom) - objectHeight;
+      const objectWidth = dragState.dragObject.size?.width || 32;
+      const objectHeight = dragState.dragObject.size?.height || 32;
 
-    // posición limitada
-    const finalX = Math.max(minX, Math.min(mouseCanvasX, maxX));
-    const finalY = Math.max(minY, Math.min(mouseCanvasY, maxY));
+      // Límites en escala real
+      const minX = 0;
+      const minY = 0;
+      const maxX = (workAreaRect.width / zoom) - objectWidth;
+      const maxY = (workAreaRect.height / zoom) - objectHeight;
 
-    onPositionUpdate(dragState.dragObject.id, { x: finalX, y: finalY });
+      // posición limitada
+      const finalX = Math.max(minX, Math.min(mouseCanvasX, maxX));
+      const finalY = Math.max(minY, Math.min(mouseCanvasY, maxY));
+
+      onPositionUpdate(dragState.dragObject.id, { x: finalX, y: finalY });
+    }
 
     setDragState({
       isDragging: false,

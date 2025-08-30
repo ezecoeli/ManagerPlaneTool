@@ -204,7 +204,7 @@ const FloorManagementModal = ({
                                     defaultValue={getDisplayName(zone.name)}
                                     onBlur={(e) => {
                                       if (e.target.value.trim() && e.target.value !== getDisplayName(zone.name)) {
-                                        onUpdateZone(floor.id, zone.id, { name: e.target.value.trim() });
+                                        onUpdateZone(floor.id, zone.id, e.target.value.trim());
                                       }
                                       setEditingZone(null);
                                     }}
