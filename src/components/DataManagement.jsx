@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { dbManager } from '../data/databaseManager.js';
 import { BsDatabase, BsDownload, BsUpload, BsTrash, BsFileEarmarkText } from 'react-icons/bs';
+import { createPortal } from 'react-dom';
 
 const DataManagement = () => {
   const [showModal, setShowModal] = useState(false);
@@ -60,7 +61,7 @@ const DataManagement = () => {
       setTimeout(() => setExportStatus(''), 3000);
     }
   };
-
+  
   return (
     <>
       <button
@@ -72,7 +73,7 @@ const DataManagement = () => {
         <span>Exportar / Importar</span>
       </button>
 
-      {showModal && (
+      {showModal && createPortal(
         <div className="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 transition-colors duration-200">
             <div className="p-6">
@@ -94,12 +95,12 @@ const DataManagement = () => {
 
               {/* Exportar/Importar todo */}
               <div className="space-y-4">
-                <div className="border border-gray-200 dark:border-gray-600 rounded-lg p-4 bg-gray-50 dark:bg-gray-700 transition-colors duration-200">
+                <div className="border border-gray-200 dark:border-gray-600 rounded-lg p-4 bg-gray-300 dark:bg-gray-700 transition-colors duration-200">
                   <h3 className="text-lg font-medium text-gray-800 dark:text-gray-100 mb-3">
-                    Copia de Seguridad Completa
+                    Copia de Seguridad Completa:
                   </h3>
-                  
                   <div className="space-y-3">
+                    {/* Exportar Todo */}
                     <button
                       onClick={handleExportAll}
                       className="w-full px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors flex items-center justify-center space-x-2"
@@ -107,22 +108,19 @@ const DataManagement = () => {
                       <BsDownload className="w-4 h-4" />
                       <span>Exportar Todo</span>
                     </button>
-
-                    <div className="relative">
-                      <input
-                        type="file"
-                        accept=".json"
-                        onChange={handleImportAll}
-                        disabled={importing}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
-                      />
-                      <button
-                        disabled={importing}
-                        className="w-full px-4 py-2 bg-orange-600 dark:bg-orange-700 text-white rounded-lg hover:bg-orange-700 dark:hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center space-x-2"
-                      >
+                    {/* Importar Todo */}
+                    <div className="relative w-full">
+                      <label className="w-full cursor-pointer px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 dark:hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center space-x-2">
+                        <input
+                          type="file"
+                          accept=".json"
+                          onChange={handleImportAll}
+                          disabled={importing}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                        />
                         <BsUpload className="w-4 h-4" />
                         <span>{importing ? 'Importando...' : 'Importar Todo'}</span>
-                      </button>
+                      </label>
                     </div>
                   </div>
                 </div>
@@ -183,7 +181,8 @@ const DataManagement = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );

@@ -9,32 +9,17 @@ export const useObjectMovement = () => {
     offset: { x: 0, y: 0 }
   });
 
+  // Iniciar drag
   const startDrag = useCallback((object, event) => {
     event.preventDefault();
     event.stopPropagation();
 
-    const canvasContainer = document.querySelector('[data-canvas-container]');
-    const workArea = document.querySelector('[data-canvas-container] .absolute.inset-6 .w-full.h-full');
-    const actualWorkArea = document.querySelector('[data-canvas-container] .absolute.inset-4');
+    const viewport = document.querySelector('[data-canvas-viewport]');
+    if (!viewport) return;
+    const viewportRect = viewport.getBoundingClientRect();
 
-    let targetRect;
-    if (actualWorkArea) {
-      targetRect = actualWorkArea.getBoundingClientRect();
-    } else if (workArea) {
-      targetRect = workArea.getBoundingClientRect();
-    } else if (canvasContainer) {
-      targetRect = canvasContainer.getBoundingClientRect();
-    } else {
-      targetRect = {
-        left: 256,
-        top: 140,
-        width: window.innerWidth - 256,
-        height: window.innerHeight - 140
-      };
-    }
-
-    const objectScreenX = targetRect.left + object.position.x;
-    const objectScreenY = targetRect.top + object.position.y;
+    const objectScreenX = viewportRect.left + object.position.x;
+    const objectScreenY = viewportRect.top + object.position.y;
 
     const offset = {
       x: event.clientX - objectScreenX,
@@ -50,45 +35,40 @@ export const useObjectMovement = () => {
     });
   }, []);
 
+  // Actualizar posición durante drag
   const updateDrag = useCallback((event) => {
-    setDragState(prev => {
-      if (!prev.isDragging) return prev;
-      
-      return {
-        ...prev,
-        currentPos: { x: event.clientX, y: event.clientY }
-      };
-    });
-  }, []);
+    if (!dragState.isDragging) return;
+    setDragState((prev) => ({
+      ...prev,
+      currentPos: { x: event.clientX, y: event.clientY }
+    }));
+  }, [dragState.isDragging]);
 
+  // Finalizar drag
   const endDrag = useCallback((onPositionUpdate, zoom = 1, pan = { x: 0, y: 0 }) => {
     if (!dragState.isDragging || !dragState.dragObject) return;
+
+    const viewport = document.querySelector('[data-canvas-viewport]');
+    if (!viewport) return;
+    const viewportRect = viewport.getBoundingClientRect();
 
     const dx = dragState.currentPos.x - dragState.startPos.x;
     const dy = dragState.currentPos.y - dragState.startPos.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
 
-    // actualiza si el usuario realmente arrastró (más de 3px)
     if (distance > 3) {
-      const workArea = document.querySelector('[data-work-area]');
-      if (!workArea) return;
-
-      const workAreaRect = workArea.getBoundingClientRect();
-
-      // Convertir la posición del mouse a coordenadas del canvas real
-      const mouseCanvasX = (dragState.currentPos.x - workAreaRect.left - pan.x) / zoom;
-      const mouseCanvasY = (dragState.currentPos.y - workAreaRect.top - pan.y) / zoom;
+      // Calcula la posición relativa al viewport
+      const mouseCanvasX = (dragState.currentPos.x - viewportRect.left - pan.x) / zoom - dragState.offset.x;
+      const mouseCanvasY = (dragState.currentPos.y - viewportRect.top - pan.y) / zoom - dragState.offset.y;
 
       const objectWidth = dragState.dragObject.size?.width || 32;
       const objectHeight = dragState.dragObject.size?.height || 32;
 
-      // Límites en escala real
       const minX = 0;
       const minY = 0;
-      const maxX = (workAreaRect.width / zoom) - objectWidth;
-      const maxY = (workAreaRect.height / zoom) - objectHeight;
+      const maxX = (viewportRect.width / zoom) - objectWidth;
+      const maxY = (viewportRect.height / zoom) - objectHeight;
 
-      // posición limitada
       const finalX = Math.max(minX, Math.min(mouseCanvasX, maxX));
       const finalY = Math.max(minY, Math.min(mouseCanvasY, maxY));
 
@@ -104,6 +84,7 @@ export const useObjectMovement = () => {
     });
   }, [dragState]);
 
+  // Cancelar drag
   const cancelDrag = useCallback(() => {
     setDragState({
       isDragging: false,

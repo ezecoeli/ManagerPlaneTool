@@ -269,7 +269,7 @@ const Canvas = ({
       <div className="bg-gray-100 dark:bg-gray-800 px-4 py-3 flex items-center justify-between transition-colors duration-200">
         <div>
           <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
-            Plano: {floorName} / {zoneName}
+            PLANO: <br /> {floorName} / {zoneName}
           </h2>
           <p className="text-sm text-gray-600 dark:text-gray-400">
             {devices.length} dispositivo{devices.length !== 1 ? 's' : ''} • {currentRoomObjects.length} objeto{currentRoomObjects.length !== 1 ? 's' : ''}
@@ -277,108 +277,99 @@ const Canvas = ({
           </p>
         </div>
         
-        <div className="flex items-center space-x-4">
-          {/* Botónes de dibujo */}
-          <div className="relative">
-          <button
-            onClick={() => setDrawMenuOpen(v => !v)}
-            className={`px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors duration-200
-              ${drawMode
-                ? 'bg-amber-600 text-white hover:bg-amber-700'
-                : 'bg-amber-600 text-white hover:bg-amber-700'
-              }`}
-            title="Dibujar"
-            style={{ marginRight: '8px' }}
-            disabled={dragState?.isDragging}
-          >
-            <span className="text-lg">
-              {drawMode === 'rect' ? '▭' : drawMode === 'line' ? '/' : <BsPen />}
-            </span>
-            <span>
-              Dibujar
-            </span>
-            <span className={`transform transition-transform ${drawMenuOpen ? 'rotate-180' : ''}`}>
-              <BsChevronDown className="ml-2" />
-            </span>
-          </button>
-          {drawMenuOpen && (
-            <>
-              <div
-                className="fixed inset-0 z-10"
-                onClick={() => setDrawMenuOpen(false)}
-                style={{ background: 'transparent' }}
-              />
-              <div className="absolute left-0 mt-2 w-40 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-20">
-                <button
-                  onClick={() => {
-                    setDrawMode('line');
-                    setDrawingLine(true);
-                    setDrawingRectangle(false);
-                    setDrawMenuOpen(false);
-                  }}
-                  className="w-full text-left px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center space-x-2"
-                >
-                  <span className="text-lg text-black dark:text-white">/</span>
-                  <span className="text-lg text-black dark:text-white">Línea</span>
-                </button>
-                <button
-                  onClick={() => {
-                    setDrawMode('rect');
-                    setDrawingRectangle(true);
-                    setDrawingLine(false);
-                    setDrawMenuOpen(false);
-                  }}
-                  className="w-full text-left px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center space-x-2"
-                >
-                  <span className="text-lg text-black dark:text-white">▭</span>
-                  <span className="text-lg text-black dark:text-white">Rectángulo</span>
-                </button>
-              </div>
-            </>
-          )}
-        </div>
-          {/* Menú de añadir objetos */}
-          <div className="relative">
-            <button
-              onClick={() => setShowEditMenu(!showEditMenu)}
-              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center space-x-2 transition-colors duration-200"
-              disabled={dragState?.isDragging}
-            >
-              <BsLayoutWtf className="w-4 h-4" />
-              <span>Objetos</span>
-              <span className={`transform transition-transform ${showEditMenu ? 'rotate-180' : ''}`}>
-                <BsChevronDown className="ml-2" />
-              </span>
-            </button>
-
-            {showEditMenu && !dragState?.isDragging && (
-              <div className="absolute top-full right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-10 transition-colors duration-200">
-                {editOptions.map(option => {
-                  const IconComponent = option.isReactIcon ? option.icon : null;
-                  
-                  return (
+        <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 sm:gap-0 relative w-full sm:w-auto">
+          {/* Botones del canvas header */}
+          <div className="absolute right-0 top-0 flex flex-col gap-2 sm:static sm:flex-row sm:gap-4 w-40 sm:w-auto min-w-0">
+            {/* Botón Dibujar */}
+            <div className="relative w-full sm:w-auto">
+              <button
+                onClick={() => setDrawMenuOpen(v => !v)}
+                className={`w-full space-x-6 sm:w-auto px-4 py-2 rounded-lg flex items-center justify-between transition-colors duration-200
+                  ${drawMode
+                    ? 'bg-amber-600 text-white hover:bg-amber-700'
+                    : 'bg-amber-600 text-white hover:bg-amber-700'
+                  }`}
+                title="Dibujar"
+                disabled={dragState?.isDragging}
+              >
+                <BsPen className="flex-shrink-0 w-5 h-5" />
+                <span className="flex-1 text-center">Dibujar</span>
+                <BsChevronDown className={`ml-2 flex-shrink-0 transition-transform ${drawMenuOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {drawMenuOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 z-10"
+                    onClick={() => setDrawMenuOpen(false)}
+                    style={{ background: 'transparent' }}
+                  />
+                  <div className="absolute left-0 mt-2 w-40 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-20">
                     <button
-                      key={option.id}
-                      onClick={() => handleEditOption(option.id)}
-                      className="w-full text-left px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center space-x-3 text-gray-700 dark:text-gray-200 transition-colors duration-200"
+                      onClick={() => {
+                        setDrawMode('line');
+                        setDrawingLine(true);
+                        setDrawingRectangle(false);
+                        setDrawMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center space-x-2"
                     >
-                      <div className="text-lg min-w-[24px] flex items-center justify-center">
-                        {IconComponent ? (
-                          <IconComponent className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-                        ) : (
-                          <span className="text-center text-gray-700 dark:text-gray-200">{option.icon}</span>
-                        )}
-                      </div>
-                      <span>{option.label}</span>
+                      <span className="text-lg text-black dark:text-white">/</span>
+                      <span className="text-lg text-black dark:text-white">Línea</span>
                     </button>
-                  );
-                })}
-              </div>
-            )}
+                    <button
+                      onClick={() => {
+                        setDrawMode('rect');
+                        setDrawingRectangle(true);
+                        setDrawingLine(false);
+                        setDrawMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center space-x-2"
+                    >
+                      <span className="text-lg text-black dark:text-white">▭</span>
+                      <span className="text-lg text-black dark:text-white">Rectángulo</span>
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+            {/* Botón Objetos */}
+            <div className="relative w-full sm:w-auto">
+              <button
+                onClick={() => setShowEditMenu(!showEditMenu)}
+                className="w-full space-x-6 sm:w-auto px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center justify-between transition-colors duration-200"
+                disabled={dragState?.isDragging}
+              >
+                <BsLayoutWtf className="flex-shrink-0 w-5 h-5" />
+                <span className="flex-1 text-center">Objetos</span>
+                <BsChevronDown className={`ml-2 flex-shrink-0 transition-transform ${showEditMenu ? 'rotate-180' : ''}`} />
+              </button>
+              {showEditMenu && !dragState?.isDragging && (
+                <div className="absolute top-full right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-10 transition-colors duration-200">
+                  {editOptions.map(option => {
+                    const IconComponent = option.isReactIcon ? option.icon : null;
+                    return (
+                      <button
+                        key={option.id}
+                        onClick={() => handleEditOption(option.id)}
+                        className="w-full text-left px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center space-x-3 text-gray-700 dark:text-gray-200 transition-colors duration-200"
+                      >
+                        <div className="text-lg min-w-[24px] flex items-center justify-center">
+                          {IconComponent ? (
+                            <IconComponent className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                          ) : (
+                            <span className="text-center text-gray-700 dark:text-gray-200">{option.icon}</span>
+                          )}
+                        </div>
+                        <span>{option.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
-          
-          {/* controles de zoom */}
-          <div className="flex items-center space-x-1 bg-white/80 dark:bg-gray-800/80 border border-gray-300 dark:border-gray-700 rounded-xl px-0.5 py-0.5 shadow-sm backdrop-blur-sm">
+          {/* Controles de zoom */}
+          <div className="flex items-center space-x-1 bg-white/80 dark:bg-gray-800/80 border border-gray-300 dark:border-gray-700 rounded-xl px-0.5 py-0.5 shadow-sm backdrop-blur-sm mt-24 sm:mt-0">
             {/* Botón Zoom Out con icono */}
             <button
               onClick={handleZoomOut}
@@ -428,7 +419,7 @@ const Canvas = ({
             <div 
               className="w-full h-full rounded-lg border-2 border-gray-500 dark:border-gray-400 transition-colors duration-200"
               data-canvas-background
-              style={{ background: "#007b8b"}}
+              style={{ background: "#005d69"}}
             >
               <div 
                 className="relative w-full h-full overflow-hidden rounded-lg"

@@ -44,19 +44,44 @@ const MainLayout = ({
       {/* Header */}
       <header className="bg-gray-400 dark:bg-black shadow-sm border-b border-gray-200 dark:border-gray-700 transition-colors duration-200">
         <div className="px-6 py-4">
-          <div className="flex items-center justify-between">
-            
-            <img 
-              src={theme === 'dark' ? logoWhite : logo}
-              alt="Manager Plane Tool Logo" 
-              className="flex w-25 h-20 object-contain"
-            />
-
-            <div className="flex items-center space-x-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            {/* Logo y tema */}
+            <div className="flex items-center justify-between w-full sm:w-auto">
+              <img 
+                src={theme === 'dark' ? logoWhite : logo}
+                alt="Manager Plane Tool Logo" 
+                className="object-contain h-12 w-auto sm:h-20 transition-all duration-200"
+              />
+            </div>
+            {/* Botones de gestión */}
+            <div className="
+              flex flex-row gap-2
+              sm:gap-4 sm:justify-end
+              w-full sm:w-auto
+              relative
+            ">
+              <DataManagement />
+              <div className="flex-1 flex justify-end relative">
+                <button
+                  onClick={() => setShowFloorManagement(true)}
+                  className="
+                    px-4 py-2 bg-gray-600 dark:bg-gray-700 text-white rounded-lg 
+                    hover:bg-gray-700 dark:hover:bg-gray-600 transition-colors 
+                    flex items-center space-x-2
+                    absolute right-0 top-0
+                    sm:static
+                  "
+                  title="Gestionar plantas y zonas"
+                >
+                  <span><BsTools /></span>
+                  <span>Administrar Zonas</span>
+                </button>
+              </div>
               {/* Botón de cambio de tema */}
               <button
                 onClick={toggleTheme}
                 className={`
+                  ml-2 sm:ml-6
                   relative p-2.5 rounded-xl transition-all duration-300 ease-in-out
                   transform hover:scale-105 active:scale-95
                   shadow-lg hover:shadow-xl
@@ -67,14 +92,11 @@ const MainLayout = ({
                 `}
                 title={theme === 'light' ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro'}
               >
-                {/* Icono colores  */}
                 {theme === 'light' ? (
                   <BsMoon className="w-5 h-5 text-gray-100 transition-colors duration-300" />
                 ) : (
                   <BsSun className="w-5 h-5 text-yellow-400 transition-colors duration-300" />
                 )}
-                
-                {/* Efecto de brillo */}
                 <div className={`
                   absolute inset-0 rounded-xl opacity-0 hover:opacity-20 transition-opacity duration-300
                   ${theme === 'light' 
@@ -82,17 +104,6 @@ const MainLayout = ({
                     : 'bg-gradient-to-r from-yellow-400 to-orange-500'
                   }
                 `} />
-              </button>
-
-              <DataManagement />
-              
-              <button
-                onClick={() => setShowFloorManagement(true)}
-                className="px-4 py-2 bg-gray-600 dark:bg-gray-700 text-white rounded-lg hover:bg-gray-700 dark:hover:bg-gray-600 transition-colors flex items-center space-x-2"
-                title="Gestionar plantas y zonas"
-              >
-                <span><BsTools /></span>
-                <span>Administrar Zonas</span>
               </button>
             </div>
           </div>

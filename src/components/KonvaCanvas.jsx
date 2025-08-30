@@ -19,6 +19,24 @@ const KonvaCanvas = ({
     const { theme } = useTheme();
     const isDark = theme === 'dark';
 
+    const [isShiftPressed, setIsShiftPressed] = useState(false);
+
+    // Detectar shift
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === 'Shift') setIsShiftPressed(true);
+        };
+        const handleKeyUp = (e) => {
+            if (e.key === 'Shift') setIsShiftPressed(false);
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        window.addEventListener('keyup', handleKeyUp);
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+            window.removeEventListener('keyup', handleKeyUp);
+        };
+    }, []);
+
     const containerRef = useRef(null);
     const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
 
@@ -53,8 +71,18 @@ const KonvaCanvas = ({
     // Handler para previsualizar
     const handleStageMouseMove = (e) => {
         const stage = e.target.getStage();
-        const pointer = stage.getPointerPosition();
+        let pointer = stage.getPointerPosition();
         if ((drawingLine || drawingRectangle) && lineStart) {
+            if (drawingLine && isShiftPressed) {
+                // Forzar perpendicularidad
+                const dx = pointer.x - lineStart.x;
+                const dy = pointer.y - lineStart.y;
+                if (Math.abs(dx) > Math.abs(dy)) {
+                    pointer = { x: pointer.x, y: lineStart.y }; // Horizontal
+                } else {
+                    pointer = { x: lineStart.x, y: pointer.y }; // Vertical
+                }
+            }
             setLinePreview(pointer);
         }
     };
@@ -131,7 +159,7 @@ const KonvaCanvas = ({
                 inset: 0,
                 width: '100%',
                 height: '100%',
-                zIndex: 1000,
+                zIndex: 10,
                 background: "transparent",
                 pointerEvents: drawingLine || drawingRectangle ? 'auto' : 'none'
             }}

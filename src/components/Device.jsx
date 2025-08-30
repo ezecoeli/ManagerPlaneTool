@@ -102,7 +102,7 @@ const Device = ({ device, zoom, onStartDrag, isBeingDragged = false }) => {
             left: '50%',
             transform: `translateX(-50%) scale(${tooltipScale})`,
             transformOrigin: 'bottom center',
-            zIndex: 9999,
+            zIndex: 50,
             minWidth: '200px',
             maxWidth: '300px'
           }}

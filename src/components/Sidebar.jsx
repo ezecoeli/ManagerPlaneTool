@@ -78,7 +78,7 @@ const Sidebar = ({
         )}
         <button
           onClick={onToggleCollapse}
-          className="flex items-center justify-center rounded-full h-8 w-8 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+          className="flex items-center justify-center rounded-full h-8 w-8 bg-gray-300 dark:bg-gray-800 hover:bg-gray-400 dark:hover:bg-gray-600 transition-colors"
           title={collapsed ? "Mostrar Sidebar" : "Ocultar Sidebar"}
         >
           {collapsed
@@ -112,7 +112,7 @@ const Sidebar = ({
                     </h3>
                     <button
                       onClick={() => handleAddSubZone(floor.id)}
-                      className="p-1 rounded-full bg-rose-500 text-white hover:bg-gray-900 transition-colors"
+                      className="p-1 rounded-full bg-rose-800 text-white hover:bg-gray-900 transition-colors"
                       title="Añadir sub-zona"
                     >
                       <BsPlus className="w-4 h-4" />
@@ -145,7 +145,7 @@ const Sidebar = ({
                           className={`w-full text-left px-3 py-2 rounded-lg transition-colors text-sm ${
                             isActive
                               ? `${zoneColorClass} ring-2 ring-blue-500 dark:ring-blue-400`
-                              : `bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-500 border-2 border-rose-500`
+                              : `bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-500 border-2 border-rose-800`
                           }`}
                         >
                           <div className="flex items-center justify-between">
@@ -182,7 +182,7 @@ const Sidebar = ({
           className={
             collapsed
               ? "w-full h-12 flex items-center justify-center bg-transparent text-[#478262] dark:text-teal-500 hover:bg-teal-800/10 dark:hover:bg-teal-500/10 transition-all"
-              : "w-48 flex items-center justify-left px-4 py-2 space-x-5 bg-[#007b8b] text-white rounded-lg hover:bg-[#38684e] transition-all"
+              : "w-48 flex items-center justify-left px-4 py-2 space-x-5 bg-[#007b8b] text-white rounded-lg hover:bg-[#005d69] transition-all"
           }
           title="Añadir nueva zona"
         >
