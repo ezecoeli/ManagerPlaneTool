@@ -7,9 +7,9 @@ class DatabaseManager {
     };
     
     this.jsonFiles = {
-      floors: '/src/data/floors.json',
-      devices: '/src/data/devices.json',
-      roomObjects: '/src/data/roomObjects.json'
+      floors: '/ManagerPlaneTool/data/floors.json',
+      devices: '/ManagerPlaneTool/data/devices.json',
+      roomObjects: '/ManagerPlaneTool/data/roomObjects.json'
     };
   }
 
