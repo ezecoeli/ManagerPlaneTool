@@ -3,7 +3,6 @@ import { BsPlus, BsPlusCircle, BsChevronDown, BsChevronRight } from 'react-icons
 import ModalSidebar from './ModalSidebar.jsx';
 import { BiSolidChevronsRight, BiSolidChevronsLeft } from "react-icons/bi";
 
-
 const Sidebar = ({
   currentFloor,
   currentZone,

@@ -24,7 +24,6 @@ const DataManagement = () => {
       setExportStatus('Exportación exitosa');
       setTimeout(() => setExportStatus(''), 3000);
     } catch (error) {
-      console.error('Error al exportar:', error);
       setExportStatus('Error en la exportación');
       setTimeout(() => setExportStatus(''), 3000);
     }
@@ -42,7 +41,6 @@ const DataManagement = () => {
         window.location.reload();
       }, 2000);
     } catch (error) {
-      console.error('Error al importar:', error);
       setExportStatus('Error en la importación');
       setTimeout(() => setExportStatus(''), 3000);
     }
@@ -56,7 +54,6 @@ const DataManagement = () => {
       setExportStatus(`${entityName} exportado exitosamente`);
       setTimeout(() => setExportStatus(''), 3000);
     } catch (error) {
-      console.error(`Error al exportar ${entityName}:`, error);
       setExportStatus(`Error al exportar ${entityName}`);
       setTimeout(() => setExportStatus(''), 3000);
     }

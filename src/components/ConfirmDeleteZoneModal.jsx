@@ -35,7 +35,7 @@ const ConfirmDeleteZoneModal = ({
       };
     }
     
-    return { icon: '❓', title: 'Eliminar', name: 'Desconocido', description: '', warning: '', warningLevel: 'low' };
+    return { icon: '', title: 'Eliminar', name: 'Desconocido', description: '', warning: '', warningLevel: 'low' };
   };
 
   const { icon, title, name, description, warning, warningLevel } = getDeleteInfo();

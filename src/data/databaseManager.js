@@ -35,7 +35,6 @@ class DatabaseManager {
       this.saveEntity(entityName, data);
       return data;
     } catch (error) {
-      console.error(`Error loading ${entityName}:`, error);
       return []; // Retornar array vacío en caso de error
     }
   }
@@ -53,11 +52,8 @@ class DatabaseManager {
         this.storageKeys[entityName], 
         JSON.stringify(dataWithMetadata)
       );
-      
-      console.log(`✅ ${entityName} guardado automáticamente`);
       return true;
     } catch (error) {
-      console.error(`❌ Error guardando ${entityName}:`, error);
       return false;
     }
   }
@@ -72,7 +68,6 @@ class DatabaseManager {
       }
       return [];
     } catch (error) {
-      console.error(`Error getting ${entityName}:`, error);
       return [];
     }
   }
@@ -173,7 +168,7 @@ class DatabaseManager {
            (Array.isArray(data.roomObjects) || data.roomObjects === undefined);
   }
 
-  // Limpiar todos los datos (útil para testing)
+  // Limpiar todos los datos (para testing)
   clearAll() {
     Object.values(this.storageKeys).forEach(key => {
       localStorage.removeItem(key);

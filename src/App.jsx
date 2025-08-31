@@ -35,7 +35,6 @@ function App() {
       if (firstZone) {
         setCurrentFloor(firstFloor.id);
         setCurrentZone(firstZone.id);
-        console.log(`📍 Ubicación inicial: ${firstFloor.name} > ${firstZone.name}`);
       }
     }
   }, [floors, currentFloor]);
@@ -149,7 +148,6 @@ function App() {
   // actualiza las propiedades del dispositivo y la posición
   const handleUpdateDevice = (updatedDevice) => {
     updateDevice(updatedDevice.id, updatedDevice);
-    console.log('Dispositivo actualizado:', updatedDevice.name, updatedDevice);
   };
 
   return (

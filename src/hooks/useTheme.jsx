@@ -25,14 +25,10 @@ export const ThemeProvider = ({ children }) => {
     
     localStorage.setItem('theme', theme);
     
-    // debug
-    console.log('Tema cambiado a:', theme);
-    console.log('Clases en HTML:', root.className);
   }, [theme]);
 
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
-    console.log('Cambiando tema de', theme, 'a', newTheme);
     setTheme(newTheme);
   };
 

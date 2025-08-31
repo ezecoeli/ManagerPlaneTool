@@ -10,14 +10,11 @@ const Device = ({ device, zoom, onStartDrag, isBeingDragged = false }) => {
 
   const handleMouseDown = (e) => {
     if (e.button === 0) {
-      console.log('Device mouseDown:', device.id);
       onStartDrag(device, e);
     }
   };
 
-  const handleDoubleClick = () => {
-    console.log('Abrir modal para dispositivo:', device.id);
-  };
+  const handleDoubleClick = () => {};
 
   // Función para obtener propiedades personalizadas
   const getCustomProperties = () => {
