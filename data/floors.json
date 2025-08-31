@@ -1,0 +1,12 @@
+[
+  {
+    "id": "Zona-X",
+    "name": "Zona X",
+    "zones": [
+      { 
+        "id": "Oficina X", 
+        "name": "Oficina X" 
+      }
+    ]
+  }
+]
