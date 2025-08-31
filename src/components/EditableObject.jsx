@@ -3,14 +3,14 @@ import { ROOM_OBJECT_TYPES } from '../data/roomTypes.js';
 import { BsDoorOpen } from "react-icons/bs";
 import { useTheme } from '../hooks/useTheme.jsx';
 
-const EditableObject = ({ object, zoom, onStartDrag, onUpdate, isBeingDragged = false }) => {
+const EditableObject = ({ object, zoom, pan, onStartDrag, onUpdate, isBeingDragged = false }) => {
   const [showTooltip, setShowTooltip] = useState(false);
   const { theme } = useTheme(); 
   const objectType = ROOM_OBJECT_TYPES[object.type];
 
   const handleMouseDown = (e) => {
     if (e.button === 0) { 
-      onStartDrag(object, e);
+      onStartDrag(object, e, zoom, pan);
     }
   };
 

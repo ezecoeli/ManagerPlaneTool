@@ -10,7 +10,7 @@ export const useObjectMovement = () => {
   });
 
   // Iniciar drag
-  const startDrag = useCallback((object, event) => {
+  const startDrag = useCallback((object, event, zoom = 1, pan = { x: 0, y: 0 }) => {
     event.preventDefault();
     event.stopPropagation();
 
@@ -18,8 +18,9 @@ export const useObjectMovement = () => {
     if (!viewport) return;
     const viewportRect = viewport.getBoundingClientRect();
 
-    const objectScreenX = viewportRect.left + object.position.x;
-    const objectScreenY = viewportRect.top + object.position.y;
+    // Ajusta por zoom y pan
+    const objectScreenX = viewportRect.left + pan.x + object.position.x * zoom;
+    const objectScreenY = viewportRect.top + pan.y + object.position.y * zoom;
 
     const offset = {
       x: event.clientX - objectScreenX,
@@ -58,8 +59,8 @@ export const useObjectMovement = () => {
 
     if (distance > 3) {
       // Calcula la posición relativa al viewport
-      const mouseCanvasX = (dragState.currentPos.x - viewportRect.left - pan.x) / zoom - dragState.offset.x;
-      const mouseCanvasY = (dragState.currentPos.y - viewportRect.top - pan.y) / zoom - dragState.offset.y;
+      const mouseCanvasX = ((dragState.currentPos.x - viewportRect.left - pan.x) / zoom) - dragState.offset.x;
+      const mouseCanvasY = ((dragState.currentPos.y - viewportRect.top - pan.y) / zoom) - dragState.offset.y;
 
       const objectWidth = dragState.dragObject.size?.width || 32;
       const objectHeight = dragState.dragObject.size?.height || 32;

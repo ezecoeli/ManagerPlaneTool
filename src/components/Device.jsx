@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { DEVICE_TYPES, DEVICE_STATUS } from '../data/devicesTypes.js';
 
-const Device = ({ device, zoom, onStartDrag, isBeingDragged = false }) => {
+const Device = ({ device, zoom, pan, onStartDrag, isBeingDragged = false }) => {
   const [showTooltip, setShowTooltip] = useState(false);
   
   const deviceType = DEVICE_TYPES[device.type];
@@ -10,7 +10,7 @@ const Device = ({ device, zoom, onStartDrag, isBeingDragged = false }) => {
 
   const handleMouseDown = (e) => {
     if (e.button === 0) {
-      onStartDrag(device, e);
+      onStartDrag(device, e, zoom, pan);
     }
   };
 

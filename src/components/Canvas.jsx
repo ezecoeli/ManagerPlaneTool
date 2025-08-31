@@ -516,6 +516,7 @@ const Canvas = ({
                       <EditableObject
                         object={roomObject}
                         zoom={zoom}
+                        pan={pan}
                         onStartDrag={onStartDrag}
                         onUpdate={handleRoomObjectUpdate}
                         isBeingDragged={dragState?.dragObject?.id === roomObject.id}
@@ -532,6 +533,7 @@ const Canvas = ({
                     <Device
                       device={device}
                       zoom={zoom}
+                      pan={pan}
                       onStartDrag={onStartDrag}
                       isBeingDragged={dragState?.dragObject?.id === device.id}
                     />
