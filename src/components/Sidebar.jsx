@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { BsPlus, BsPlusCircle, BsChevronDown, BsChevronRight } from 'react-icons/bs';
 import ModalSidebar from './ModalSidebar.jsx';
 import { BiSolidChevronsRight, BiSolidChevronsLeft } from "react-icons/bi";
@@ -19,26 +19,27 @@ const Sidebar = ({
   });
 
   // Estado para controlar la modal personalizada
-  const [modal, setModal] = useState({ open: false, type: null, floorId: null });
+  const [modal, setModal] = useState({ open: false, type: null });
+  const [subZoneFloorId, setSubZoneFloorId] = useState(floors[0]?.id || '');
 
   // Abrir modal para zona principal
-  const handleAddZone = () => setModal({ open: true, type: "zone", floorId: null });
+  const handleAddZone = () => setModal({ open: true, type: "zone" });
 
   // Abrir modal para sub-zona
-  const handleAddSubZone = (floorId) => setModal({ open: true, type: "subzone", floorId });
+  const handleAddSubZone = () => setModal({ open: true, type: "subzone" });
 
   // Confirmar desde modal
   const handleModalConfirm = (name) => {
     if (modal.type === "zone") {
       addFloor({ name });
-    } else if (modal.type === "subzone" && modal.floorId) {
-      addZone(modal.floorId, name);
+    } else if (modal.type === "subzone" && subZoneFloorId) {
+      addZone(subZoneFloorId, name);
     }
-    setModal({ open: false, type: null, floorId: null });
+    setModal({ open: false, type: null });
   };
 
   // Cancelar modal
-  const handleModalCancel = () => setModal({ open: false, type: null, floorId: null });
+  const handleModalCancel = () => setModal({ open: false, type: null });
 
   const toggleFloor = (floorId) => {
     setExpandedFloors(prev => ({
@@ -68,16 +69,24 @@ const Sidebar = ({
     return 'Sin nombre';
   };
 
+  // Actualiza el floorId seleccionado cuando cambia la lista de floors
+  // o cuando se abre la modal de subzona para que siempre haya un valor válido..
+  React.useEffect(() => {
+    if (modal.open && modal.type === "subzone") {
+      setSubZoneFloorId(floors[0]?.id || '');
+    }
+  }, [modal.open, modal.type, floors]);
+
   return (
-    <div className="h-full flex flex-col bg-gray-200 dark:bg-gray-700 transition-colors duration-200">
+    <div className="h-full flex flex-col bg-gray-300 dark:bg-gray-700 transition-colors duration-200">
       {/* Header del Sidebar */}
-      <div className="justify-center p-3 flex items-center">
+      <div className="flex justify-center items-center p-2 mb-2 mt-2"> 
         {!collapsed && (
-          <h1 className="text-xl font-black text-gray-800 dark:text-gray-100 flex-1">ZONAS DISPONIBLES</h1>
+          <h1 className="text-xl font-black ml-2 text-gray-800 dark:text-gray-100 flex-1">LISTADO DE ZONAS</h1>
         )}
         <button
           onClick={onToggleCollapse}
-          className="flex items-center justify-center rounded-full h-8 w-8 bg-gray-300 dark:bg-gray-800 hover:bg-gray-400 dark:hover:bg-gray-600 transition-colors"
+          className="flex items-center justify-center rounded-full h-8 w-8 bg-gray-400 dark:bg-gray-800 hover:bg-gray-500 dark:hover:bg-gray-600 transition-colors"
           title={collapsed ? "Mostrar Sidebar" : "Ocultar Sidebar"}
         >
           {collapsed
@@ -95,27 +104,70 @@ const Sidebar = ({
         placeholder={modal.type === "zone" ? "Escribe el nombre" : "Escribe el nombre"}
         onConfirm={handleModalConfirm}
         onCancel={handleModalCancel}
-      />
+      >
+        {/* Si es subzona muestra el selector de planta */}
+        {modal.type === "subzone" && (
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Añadir en:
+            </label>
+            <select
+              value={subZoneFloorId}
+              onChange={e => setSubZoneFloorId(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 transition-colors duration-200"
+            >
+              {floors.map(floor => (
+                <option key={floor.id} value={floor.id}>
+                  {getDisplayName(floor.name)}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+      </ModalSidebar>
+
+      {/* Botones para añadir zona y sub-zona */}
+      <div className="flex flex-col gap-2 justify-center items-center mb-2">
+        {/* Añadir Zona */}
+        <button
+          onClick={handleAddZone}
+          className={
+            collapsed
+              ? "w-full h-12 flex items-center justify-center bg-transparent text-[#478262] dark:text-teal-500 hover:bg-teal-800/10 dark:hover:bg-teal-500/10 transition-all"
+              : "w-52 flex items-center justify-left px-4 py-2 space-x-6 bg-[#007b8b] text-white rounded-lg hover:bg-[#005d69] transition-all"
+          }
+          title="Añadir nueva zona"
+        >
+          <BsPlusCircle className={`transition-all ${collapsed ? 'w-7 h-7' : 'w-5 h-5'}`} />
+          {!collapsed && <span className="ml-2">Añadir Zona</span>}
+        </button>
+        {/* Añadir Sub-zona */}
+        <button
+          onClick={handleAddSubZone}
+          className={
+            collapsed
+              ? "w-full h-12 flex items-center justify-center bg-transparent text-rose-800 dark:text-rose-400 hover:bg-rose-900/10 dark:hover:bg-rose-500/10 transition-all"
+              : "w-52 flex items-center justify-left px-4 py-2 space-x-6 bg-rose-800 text-white rounded-lg hover:bg-rose-950 transition-all"
+          }
+          title="Añadir sub-zona"
+        >
+          <BsPlusCircle className={`transition-all ${collapsed ? 'w-7 h-7' : 'w-5 h-5'}`} />
+          {!collapsed && <span className="ml-2">Añadir Sub-zona</span>}
+        </button>
+      </div>
 
       {/* Lista de plantas y zonas  si no está colapsado */}
       {!collapsed && (
         <div className="flex-1 overflow-y-auto pt-2">
           <div className="space-y-2">
             {floors.map((floor) => (
-              <div key={floor.id} className="border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-300 dark:bg-gray-500/50 transition-colors duration-200">
+              <div key={floor.id} className="dark:border-gray-700 rounded-lg bg-gray-400 dark:bg-gray-500/50 transition-colors duration-200">
                 {/* Header zonas*/}
                 <div className="w-full pl-2 pr-4 py-3 flex items-center justify-between text-left rounded-lg transition-colors">
                   <div className="flex items-center space-x-4">
                     <h3 className="font-medium flex rounded-lg w-full px-3 py-2 bg-[#007b8b] dark:text-white">
                       {getDisplayName(floor.name)}
                     </h3>
-                    <button
-                      onClick={() => handleAddSubZone(floor.id)}
-                      className="p-1 rounded-full bg-rose-800 text-white hover:bg-gray-900 transition-colors"
-                      title="Añadir sub-zona"
-                    >
-                      <BsPlus className="w-4 h-4" />
-                    </button>
                   </div>
                   <button
                     onClick={() => toggleFloor(floor.id)}
@@ -143,14 +195,14 @@ const Sidebar = ({
                           onClick={() => onFloorChange(floor.id, zone.id)}
                           className={`w-full text-left px-3 py-2 rounded-lg transition-colors text-sm ${
                             isActive
-                              ? `${zoneColorClass} ring-2 ring-blue-500 dark:ring-blue-400`
+                              ? `${zoneColorClass} ring-2 ring-rose-800`
                               : `bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-500 border-2 border-rose-800`
                           }`}
                         >
                           <div className="flex items-center justify-between">
                             <span className="font-medium">{getDisplayName(zone.name)}</span>
                             {isActive && (
-                              <span className="text-xs bg-blue-500 dark:bg-blue-600 text-white px-2 py-1 rounded-full">
+                              <span className="text-xs bg-lime-600 text-white px-2 py-1 rounded-full">
                                 
                               </span>
                             )}
@@ -174,37 +226,24 @@ const Sidebar = ({
         </div>
       )}
 
-      {/* Botón para añadir nueva zona */}
-      <div className="flex justify-center mb-2">
-        <button
-          onClick={handleAddZone}
-          className={
-            collapsed
-              ? "w-full h-12 flex items-center justify-center bg-transparent text-[#478262] dark:text-teal-500 hover:bg-teal-800/10 dark:hover:bg-teal-500/10 transition-all"
-              : "w-48 flex items-center justify-left px-4 py-2 space-x-5 bg-[#007b8b] text-white rounded-lg hover:bg-[#005d69] transition-all"
-          }
-          title="Añadir nueva zona"
-        >
-          <BsPlusCircle className={`transition-all ${collapsed ? 'w-7 h-7' : 'w-5 h-5'}`} />
-          {!collapsed && <span className="ml-2">Añadir Zona</span>}
-        </button>
-      </div>
       {/* Espacio entre botones solo cuando no está colapsado */}
       {!collapsed && <div className="my-2" />}
 
       {/* Botón de añadir dispositivo */}
-      <div className="flex justify-center mb-2">
+      <div
+        className={`flex justify-center items-center border-t border-gray-400 ${!collapsed ? 'p-4' : ''}`}
+      >
         <button
           onClick={onAddDevice}
           className={
             collapsed
               ? "w-full h-12 flex items-center justify-center bg-transparent text-blue-700 dark:text-blue-400 hover:bg-blue-900/10 dark:hover:bg-blue-500/10 transition-all"
-              : "w-50 h-10 px-4 py-3 flex items-center justify-left space-x-3 bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-600 text-white rounded-lg transition-all"
+              : "w-52 h-10 flex items-center justify-center px-4 py-2 bg-blue-700 hover:bg-blue-900 text-white rounded-lg transition-all"
           }
           title="Añadir nuevo dispositivo"
         >
           <BsPlusCircle className={`transition-all ${collapsed ? 'w-7 h-7' : 'w-5 h-5'}`} />
-          {!collapsed && <span>Añadir Dispositivo</span>}
+          {!collapsed && <span className="ml-2 whitespace-nowrap">Añadir Dispositivo</span>}
         </button>
         {(!currentFloor || !currentZone) && !collapsed && (
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">

@@ -1,52 +1,80 @@
 import { useState } from "react";
 
-const ModalInput = ({ isOpen, title, label, placeholder, onConfirm, onCancel }) => {
-  const [value, setValue] = useState("");
+const ModalSidebar = ({
+  isOpen,
+  title,
+  label,
+  placeholder,
+  onConfirm,
+  onCancel,
+  children,
+}) => {
+  const [inputValue, setInputValue] = useState("");
+  const [showError, setShowError] = useState(false);
 
   if (!isOpen) return null;
 
   const handleConfirm = () => {
-    if (value.trim()) {
-      onConfirm(value.trim());
-      setValue("");
+    if (inputValue.trim()) {
+      onConfirm(inputValue.trim());
+      setInputValue("");
+      setShowError(false);
+    } else {
+      setShowError(true);
     }
   };
 
   const handleCancel = () => {
-    setValue("");
+    setInputValue("");
+    setShowError(false);
     onCancel();
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <div className="bg-white dark:bg-gray-950 rounded-lg shadow-lg p-6 w-full max-w-xs">
-        <h2 className="text-lg font-bold mb-4 text-gray-800 dark:text-gray-100">{title}</h2>
-        <label className="block text-sm mb-2 text-gray-700 dark:text-gray-300">{label}</label>
-        <input
-          className="w-full text-sm px-2 py-2 border border-gray-300 dark:border-gray-600 rounded mb-4 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-          placeholder={placeholder}
-          value={value}
-          onChange={e => setValue(e.target.value)}
-          autoFocus
-        />
-        <div className="flex justify-end space-x-2">
-          <button
-            onClick={handleCancel}
-            className="px-3 py-1 rounded bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600"
-          >
-            Cancelar
-          </button>
-          <button
-            onClick={handleConfirm}
-            className="px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700"
-            disabled={!value.trim()}
-          >
-            Aceptar
-          </button>
-        </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-xs">
+        <h2 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-100">{title}</h2>
+        <form
+          onSubmit={e => {
+            e.preventDefault();
+            handleConfirm();
+          }}
+        >
+          {children}
+          <label className="block text-sm mb-1">{label}</label>
+          <input
+            type="text"
+            value={inputValue}
+            onChange={e => {
+              setInputValue(e.target.value);
+              setShowError(false);
+            }}
+            placeholder={placeholder}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 transition-colors duration-200"
+          />
+          {showError && (
+            <div className="text-red-500 text-xs mt-2">* Para confirmar rellena los campos.</div>
+          )}
+          <div className="flex justify-end gap-2 mt-6">
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="px-3 py-1 rounded bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-gray-100"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              className="px-3 py-1 rounded bg-blue-600 text-white"
+            >
+              Guardar
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
 };
 
-export default ModalInput;
+
+export default ModalSidebar;

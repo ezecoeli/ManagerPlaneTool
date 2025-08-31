@@ -71,7 +71,7 @@ const MainLayout = ({
                     absolute right-0 top-0
                     sm:static
                   "
-                  title="Gestionar plantas y zonas"
+                  title="Gestionar tus planos"
                 >
                   <span><BsTools /></span>
                   <span>Administrar Zonas</span>

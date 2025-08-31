@@ -304,7 +304,7 @@ const Canvas = ({
                     ? 'bg-amber-600 text-white hover:bg-amber-700'
                     : 'bg-amber-600 text-white hover:bg-amber-700'
                   }`}
-                title="Dibujar"
+                title="Dibujar formas"
                 disabled={dragState?.isDragging}
               >
                 <BsPen className="flex-shrink-0 w-5 h-5" />
@@ -353,6 +353,7 @@ const Canvas = ({
                 onClick={() => setShowEditMenu(!showEditMenu)}
                 className="w-full space-x-6 sm:w-auto px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center justify-between transition-colors duration-200"
                 disabled={dragState?.isDragging}
+                title="Añadir objeto"
               >
                 <BsLayoutWtf className="flex-shrink-0 w-5 h-5" />
                 <span className="flex-1 text-center">Objetos</span>
@@ -389,7 +390,7 @@ const Canvas = ({
             <button
               onClick={handleZoomOut}
               className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-gray-700 dark:text-gray-200 transition-colors duration-200 flex items-center justify-center"
-              title="Alejar (Zoom Out)"
+              title="Alejar"
               disabled={dragState?.isDragging}
             >
               <BsZoomOut className="w-4 h-4" />
@@ -404,7 +405,7 @@ const Canvas = ({
             <button
               onClick={handleZoomIn}
               className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-gray-700 dark:text-gray-200 transition-colors duration-200 flex items-center justify-center"
-              title="Acercar (Zoom In)"
+              title="Acercar"
               disabled={dragState?.isDragging}
             >
               <BsZoomIn className="w-4 h-4" />
