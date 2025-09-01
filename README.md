@@ -4,6 +4,17 @@ Manager Plane Tool es una aplicación web desarrollada en React que permite la g
 
 ---
 
+## Stack Tecnológico y herramientas destacadas
+
+**Stack Tecnológico:** React + Vite + Tailwind CSS v4
+
+### Librerías y herramientas destacadas
+
+- **react-konva / konva**  
+  Permiten trabajar con gráficos y objetos interactivos en canvas dentro de React, ideal para planos y edición visual avanzada.
+
+---
+
 ## Características principales
 
 - **Visualización de planos**: Permite navegar entre diferentes plantas y zonas de una instalación.
