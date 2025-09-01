@@ -1,6 +1,7 @@
 # Manager Plane Tool
 
-Manager Plane Tool es una aplicación web desarrollada en React que permite la gestión visual y administrativa de planos, zonas, dispositivos y objetos en instalaciones. Está pensada para facilitar la organización y el control de espacios físicos, permitiendo a los usuarios dibujar, editar y exportar la información de sus planos de manera sencilla y eficiente.
+Manager Plane Tool es una aplicación web desarrollada en React que permite la gestión visual y administrativa de planos, zonas, dispositivos y objetos en instalaciones. 
+Fue pensada y creada para facilitar la organización y el control de los dispositivos informáticos en cualquier tipo de establecimiento, permitiendo a los usuarios dibujar, editar y exportar la información de sus planos de manera sencilla y eficiente.
 
 ---
 
