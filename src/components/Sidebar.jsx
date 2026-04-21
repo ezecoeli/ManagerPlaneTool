@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { BsPlus, BsPlusCircle, BsChevronDown, BsChevronRight } from 'react-icons/bs';
+import { BsPlusCircle, BsChevronDown, BsChevronRight, BsSearch } from 'react-icons/bs';
 import ModalSidebar from './ModalSidebar.jsx';
+import DeviceDetailModal from './DeviceDetailModal.jsx';
 import { BiSolidChevronsRight, BiSolidChevronsLeft } from "react-icons/bi";
+import { DEVICE_TYPES, DEVICE_STATUS } from '../data/devicesTypes.js';
 
 const Sidebar = ({
   currentFloor,
@@ -11,12 +13,18 @@ const Sidebar = ({
   addFloor, 
   addZone,
   floors = [],
+  devices = [],
   collapsed = false,
   onToggleCollapse
 }) => {
   const [expandedFloors, setExpandedFloors] = useState({
     [currentFloor]: true
   });
+
+  const [activeTab, setActiveTab] = useState('zonas');
+  const [zonaSearch, setZonaSearch] = useState('');
+  const [deviceSearch, setDeviceSearch] = useState('');
+  const [selectedDevice, setSelectedDevice] = useState(null);
 
   // Estado para controlar la modal personalizada
   const [modal, setModal] = useState({ open: false, type: null });
@@ -77,12 +85,42 @@ const Sidebar = ({
     }
   }, [modal.open, modal.type, floors]);
 
+  // Filtrado de zonas por búsqueda
+  const filteredFloors = floors
+    .filter(floor => {
+      if (!zonaSearch) return true;
+      const q = zonaSearch.toLowerCase();
+      return (
+        getDisplayName(floor.name).toLowerCase().includes(q) ||
+        (floor.zones || []).some(z => getDisplayName(z.name).toLowerCase().includes(q))
+      );
+    })
+    .map(floor => ({
+      ...floor,
+      zones: zonaSearch
+        ? (floor.zones || []).filter(z => {
+            const q = zonaSearch.toLowerCase();
+            return (
+              getDisplayName(z.name).toLowerCase().includes(q) ||
+              getDisplayName(floor.name).toLowerCase().includes(q)
+            );
+          })
+        : floor.zones
+    }));
+
+  // Filtrado de dispositivos por búsqueda
+  const filteredDevices = devices.filter(d =>
+    d.name?.toLowerCase().includes(deviceSearch.toLowerCase())
+  );
+
   return (
     <div className="h-full flex flex-col bg-gray-300 dark:bg-gray-700 transition-colors duration-200">
       {/* Header del Sidebar */}
-      <div className="flex justify-center items-center p-2 mb-2 mt-2"> 
+      <div className="flex justify-center items-center p-2 mb-1 mt-2"> 
         {!collapsed && (
-          <h1 className="text-xl font-black ml-2 text-gray-800 dark:text-gray-100 flex-1">LISTADO DE ZONAS</h1>
+          <h1 className="text-xl font-black ml-2 text-gray-800 dark:text-gray-100 flex-1">
+            {activeTab === 'zonas' ? 'ZONAS' : 'DISPOSITIVOS'}
+          </h1>
         )}
         <button
           onClick={onToggleCollapse}
@@ -95,6 +133,52 @@ const Sidebar = ({
           }
         </button>
       </div>
+
+      {/* Pestañas ZONAS / DISPOSITIVOS */}
+      {!collapsed && (
+        <div className="flex mx-2 mb-2 rounded-lg overflow-hidden border border-gray-400 dark:border-gray-600">
+          <button
+            onClick={() => setActiveTab('zonas')}
+            className={`flex-1 py-1.5 text-xs font-bold tracking-wider transition-colors ${
+              activeTab === 'zonas'
+                ? 'bg-[#007b8b] text-white'
+                : 'bg-transparent text-gray-600 dark:text-gray-300 hover:bg-gray-400/40 dark:hover:bg-gray-600/40'
+            }`}
+          >
+            ZONAS
+          </button>
+          <button
+            onClick={() => setActiveTab('dispositivos')}
+            className={`flex-1 py-1.5 text-xs font-bold tracking-wider transition-colors ${
+              activeTab === 'dispositivos'
+                ? 'bg-[#007b8b] text-white'
+                : 'bg-transparent text-gray-600 dark:text-gray-300 hover:bg-gray-400/40 dark:hover:bg-gray-600/40'
+            }`}
+          >
+            DISPOSITIVOS
+          </button>
+        </div>
+      )}
+
+      {/* Buscador */}
+      {!collapsed && (
+        <div className="px-2 mb-2">
+          <div className="relative">
+            <BsSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500 dark:text-gray-400 pointer-events-none" />
+            <input
+              type="text"
+              placeholder={activeTab === 'zonas' ? 'Buscar zona...' : 'Buscar dispositivo...'}
+              value={activeTab === 'zonas' ? zonaSearch : deviceSearch}
+              onChange={e =>
+                activeTab === 'zonas'
+                  ? setZonaSearch(e.target.value)
+                  : setDeviceSearch(e.target.value)
+              }
+              className="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-400 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#007b8b] dark:focus:ring-teal-400 transition-colors"
+            />
+          </div>
+        </div>
+      )}
       
       {/* Modal para añadir zona o sub-zona */}
       <ModalSidebar
@@ -126,101 +210,156 @@ const Sidebar = ({
         )}
       </ModalSidebar>
 
-      {/* Botones para añadir zona y sub-zona */}
-      <div className="flex flex-col gap-2 justify-center items-center mb-2">
-        {/* Añadir Zona */}
-        <button
-          onClick={handleAddZone}
-          className={
-            collapsed
-              ? "w-full h-12 flex items-center justify-center bg-transparent text-[#478262] dark:text-teal-500 hover:bg-teal-800/10 dark:hover:bg-teal-500/10 transition-all"
-              : "w-52 flex items-center justify-left px-4 py-2 space-x-6 bg-[#007b8b] text-white rounded-lg hover:bg-[#005d69] transition-all"
-          }
-          title="Añadir nueva zona"
-        >
-          <BsPlusCircle className={`transition-all ${collapsed ? 'w-7 h-7' : 'w-5 h-5'}`} />
-          {!collapsed && <span className="ml-2">Añadir Zona</span>}
-        </button>
-        {/* Añadir Sub-zona */}
-        <button
-          onClick={handleAddSubZone}
-          className={
-            collapsed
-              ? "w-full h-12 flex items-center justify-center bg-transparent text-rose-800 dark:text-rose-400 hover:bg-rose-900/10 dark:hover:bg-rose-500/10 transition-all"
-              : "w-52 flex items-center justify-left px-4 py-2 space-x-6 bg-rose-800 text-white rounded-lg hover:bg-rose-950 transition-all"
-          }
-          title="Añadir sub-zona"
-        >
-          <BsPlusCircle className={`transition-all ${collapsed ? 'w-7 h-7' : 'w-5 h-5'}`} />
-          {!collapsed && <span className="ml-2">Añadir Sub-zona</span>}
-        </button>
-      </div>
-
-      {/* Lista de plantas y zonas  si no está colapsado */}
-      {!collapsed && (
-        <div className="flex-1 overflow-y-auto pt-2">
-          <div className="space-y-2">
-            {floors.map((floor) => (
-              <div key={floor.id} className="dark:border-gray-700 rounded-lg bg-gray-400 dark:bg-gray-500/50 transition-colors duration-200">
-                {/* Header zonas*/}
-                <div className="w-full pl-2 pr-4 py-3 flex items-center justify-between text-left rounded-lg transition-colors">
-                  <div className="flex items-center space-x-4">
-                    <h3 className="font-medium flex rounded-lg w-full px-3 py-2 bg-[#007b8b] dark:text-white">
-                      {getDisplayName(floor.name)}
-                    </h3>
-                  </div>
-                  <button
-                    onClick={() => toggleFloor(floor.id)}
-                    className="ml-2 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-                    title={expandedFloors[floor.id] ? "Colapsar" : "Expandir"}
-                  >
-                    {expandedFloors[floor.id] ? (
-                      <BsChevronDown className="w-4 h-4 text-gray-800 dark:text-gray-300" />
-                    ) : (
-                      <BsChevronRight className="w-4 h-4 text-gray-800 dark:text-gray-300" />
-                    )}
-                  </button>
-                </div>
-
-                {/* Lista de zonas */}
-                {expandedFloors[floor.id] && Array.isArray(floor.zones) && (
-                  <div className="px-4 pb-3 ml-4 space-y-2">
-                    {floor.zones.map((zone, zoneIndex) => {
-                      const isActive = currentFloor === floor.id && currentZone === zone.id;
-                      const zoneColorClass = getZoneColor(zoneIndex);
-                      
-                      return (
-                        <button
-                          key={zone.id}
-                          onClick={() => onFloorChange(floor.id, zone.id)}
-                          className={`w-full text-left px-3 py-2 rounded-lg transition-colors text-sm ${
-                            isActive
-                              ? `${zoneColorClass} ring-2 ring-rose-800`
-                              : `bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-500 border-2 border-rose-800`
-                          }`}
-                        >
-                          <div className="flex items-center justify-between">
-                            <span className="font-medium">{getDisplayName(zone.name)}</span>
-                            {isActive && (
-                              <span className="text-xs bg-lime-600 text-white px-2 py-1 rounded-full">
-                                
-                              </span>
-                            )}
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            ))}
+      {/* Botones para añadir zona y sub-zona — solo en pestaña ZONAS */}
+      {(activeTab === 'zonas' || collapsed) && (
+        <>
+          <div className="flex flex-col gap-2 justify-center items-center mb-2">
+            {/* Añadir Zona */}
+            <button
+              onClick={handleAddZone}
+              className={
+                collapsed
+                  ? "w-full h-12 flex items-center justify-center bg-transparent text-[#478262] dark:text-teal-500 hover:bg-teal-800/10 dark:hover:bg-teal-500/10 transition-all"
+                  : "w-52 flex items-center justify-left px-4 py-2 space-x-6 bg-[#007b8b] text-white rounded-lg hover:bg-[#005d69] transition-all"
+              }
+              title="Añadir nueva zona"
+            >
+              <BsPlusCircle className={`transition-all ${collapsed ? 'w-7 h-7' : 'w-5 h-5'}`} />
+              {!collapsed && <span className="ml-2">Añadir Zona</span>}
+            </button>
+            {/* Añadir Sub-zona */}
+            <button
+              onClick={handleAddSubZone}
+              className={
+                collapsed
+                  ? "w-full h-12 flex items-center justify-center bg-transparent text-rose-800 dark:text-rose-400 hover:bg-rose-900/10 dark:hover:bg-rose-500/10 transition-all"
+                  : "w-52 flex items-center justify-left px-4 py-2 space-x-6 bg-rose-800 text-white rounded-lg hover:bg-rose-950 transition-all"
+              }
+              title="Añadir sub-zona"
+            >
+              <BsPlusCircle className={`transition-all ${collapsed ? 'w-7 h-7' : 'w-5 h-5'}`} />
+              {!collapsed && <span className="ml-2">Añadir Sub-zona</span>}
+            </button>
           </div>
 
-          {/* Mensaje si no hay plantas */}
-          {floors.length === 0 && (
+          {/* Lista de plantas y zonas — si no está colapsado */}
+          {!collapsed && (
+            <div className="flex-1 overflow-y-auto pt-2">
+              <div className="space-y-2">
+                {filteredFloors.map((floor) => (
+                  <div key={floor.id} className="dark:border-gray-700 rounded-lg bg-gray-400 dark:bg-gray-500/50 transition-colors duration-200">
+                    {/* Header zona */}
+                    <div className="w-full pl-2 pr-4 py-3 flex items-center justify-between text-left rounded-lg transition-colors">
+                      <div className="flex items-center space-x-4">
+                        <h3 className="font-medium flex rounded-lg w-full px-3 py-2 bg-[#007b8b] dark:text-white">
+                          {getDisplayName(floor.name)}
+                        </h3>
+                      </div>
+                      <button
+                        onClick={() => toggleFloor(floor.id)}
+                        className="ml-2 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                        title={expandedFloors[floor.id] ? "Colapsar" : "Expandir"}
+                      >
+                        {expandedFloors[floor.id] ? (
+                          <BsChevronDown className="w-4 h-4 text-gray-800 dark:text-gray-300" />
+                        ) : (
+                          <BsChevronRight className="w-4 h-4 text-gray-800 dark:text-gray-300" />
+                        )}
+                      </button>
+                    </div>
+
+                    {/* Lista de sub-zonas */}
+                    {expandedFloors[floor.id] && Array.isArray(floor.zones) && (
+                      <div className="px-4 pb-3 ml-4 space-y-2">
+                        {floor.zones.map((zone, zoneIndex) => {
+                          const isActive = currentFloor === floor.id && currentZone === zone.id;
+                          const zoneColorClass = getZoneColor(zoneIndex);
+                          return (
+                            <button
+                              key={zone.id}
+                              onClick={() => onFloorChange(floor.id, zone.id)}
+                              className={`w-full text-left px-3 py-2 rounded-lg transition-colors text-sm ${
+                                isActive
+                                  ? `${zoneColorClass} ring-2 ring-rose-800`
+                                  : `bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-500 border-2 border-rose-800`
+                              }`}
+                            >
+                              <div className="flex items-center justify-between">
+                                <span className="font-medium">{getDisplayName(zone.name)}</span>
+                                {isActive && (
+                                  <span className="text-xs bg-lime-600 text-white px-2 py-1 rounded-full">
+                                    
+                                  </span>
+                                )}
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Mensaje si no hay resultados */}
+              {filteredFloors.length === 0 && (
+                <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                  {zonaSearch ? (
+                    <p className="text-sm">Sin resultados para "{zonaSearch}"</p>
+                  ) : (
+                    <>
+                      <p className="text-sm">No hay plantas configuradas</p>
+                      <p className="text-xs mt-1">Usa "Crear/Modificar Zonas" para empezar</p>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+        </>
+      )}
+
+      {/* ===== PESTAÑA DISPOSITIVOS ===== */}
+      {activeTab === 'dispositivos' && !collapsed && (
+        <div className="flex-1 overflow-y-auto">
+          {filteredDevices.length === 0 ? (
             <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-              <p className="text-sm">No hay plantas configuradas</p>
-              <p className="text-xs mt-1">Usa "Crear/Modificar Zonas" para empezar</p>
+              {deviceSearch ? (
+                <p className="text-sm">Sin resultados para "{deviceSearch}"</p>
+              ) : (
+                <p className="text-sm">No hay dispositivos añadidos</p>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-1 px-2 py-1">
+              {filteredDevices.map(device => {
+                const typeConfig = DEVICE_TYPES[device.type];
+                const statusConfig = DEVICE_STATUS[device.status];
+                const Icon = typeConfig?.icon;
+                return (
+                  <div
+                    key={device.id}
+                    onDoubleClick={() => setSelectedDevice(device)}
+                    className="flex items-center space-x-3 px-3 py-2.5 rounded-lg bg-white dark:bg-gray-600 hover:bg-gray-50 dark:hover:bg-gray-500 cursor-pointer transition-colors select-none"
+                    title="Doble clic para ver detalles"
+                  >
+                    {Icon && <Icon className="w-4 h-4 text-gray-600 dark:text-gray-300 flex-shrink-0" />}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">
+                        {device.name}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                        {typeConfig?.name || device.type}
+                      </p>
+                    </div>
+                    <div
+                      className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                      style={{ backgroundColor: statusConfig?.color || '#888' }}
+                      title={statusConfig?.name || device.status}
+                    />
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
@@ -251,6 +390,15 @@ const Sidebar = ({
           </p>
         )}
       </div>
+
+      {/* Modal de detalle de dispositivo */}
+      {selectedDevice && (
+        <DeviceDetailModal
+          device={selectedDevice}
+          floors={floors}
+          onClose={() => setSelectedDevice(null)}
+        />
+      )}
     </div>
   );
 };

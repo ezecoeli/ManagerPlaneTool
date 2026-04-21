@@ -158,6 +158,7 @@ function App() {
         onFloorChange={handleFloorChange}
         onAddDevice={handleAddDevice}
         floors={floors}
+        devices={devices}
         addFloor={addFloor}
         updateFloor={updateFloor}
         deleteFloor={deleteFloor}

@@ -14,6 +14,7 @@ const MainLayout = ({
   onFloorChange,
   onAddDevice,
   floors,
+  devices,
   addFloor,
   updateFloor,
   deleteFloor,
@@ -120,6 +121,7 @@ const MainLayout = ({
             addFloor={addFloor}
             addZone={addZone}
             floors={floors}
+            devices={devices}
             collapsed={sidebarCollapsed} 
             onToggleCollapse={() => setSidebarCollapsed(v => !v)} 
           />

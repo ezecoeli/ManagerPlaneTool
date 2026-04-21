@@ -29,6 +29,10 @@ Thumbs.db
 logs
 *.log
 
+# Internal project docs (not for public repo)
+Requirements.md
+Roadmap.md
+
 # Runtime data
 pids
 *.pid
